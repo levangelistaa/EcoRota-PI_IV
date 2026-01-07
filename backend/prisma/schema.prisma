@@ -15,8 +15,10 @@ model Administrador {
   creation_date DateTime @default(now())
   update_date   DateTime @updatedAt
 
-  created_routes Route[] @relation("RouteCreatedBy")
-  updated_routes Route[] @relation("RouteUpdatedBy")
+  created_routes        Route[]        @relation("RouteCreatedBy")
+  updated_routes        Route[]        @relation("RouteUpdatedBy")
+  created_neighborhoods Neighborhood[] @relation("NeighborhoodCreatedBy")
+  updated_neighborhoods Neighborhood[] @relation("NeighborhoodUpdatedBy")
 
   @@map("administradores")
 }
@@ -37,5 +39,29 @@ model Route {
   admin_id_updated Int?
   updated_by       Administrador? @relation("RouteUpdatedBy", fields: [admin_id_updated], references: [id])
 
+  neighborhoods Neighborhood[]
+
   @@map("routes")
+}
+
+model Neighborhood {
+  id                  Int      @id @default(autoincrement())
+  name                String
+  latitude            Float
+  longitude           Float
+  cep                 String
+  population_estimate Int?
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  route_id         Int
+  route            Route @relation(fields: [route_id], references: [id])
+
+  admin_id_created Int
+  created_by       Administrador @relation("NeighborhoodCreatedBy", fields: [admin_id_created], references: [id])
+
+  admin_id_updated Int?
+  updated_by       Administrador? @relation("NeighborhoodUpdatedBy", fields: [admin_id_updated], references: [id])
+
+  @@map("neighborhoods")
 }

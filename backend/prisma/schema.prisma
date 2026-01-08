@@ -54,8 +54,8 @@ model Neighborhood {
   created_at          DateTime @default(now())
   updated_at          DateTime @updatedAt
 
-  route_id         Int
-  route            Route @relation(fields: [route_id], references: [id])
+  route_id Int
+  route    Route @relation(fields: [route_id], references: [id])
 
   admin_id_created Int
   created_by       Administrador @relation("NeighborhoodCreatedBy", fields: [admin_id_created], references: [id])
@@ -63,5 +63,21 @@ model Neighborhood {
   admin_id_updated Int?
   updated_by       Administrador? @relation("NeighborhoodUpdatedBy", fields: [admin_id_updated], references: [id])
 
+  subscribers Subscriber[]
+
   @@map("neighborhoods")
+}
+
+model Subscriber {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  address    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  neighborhood_id Int
+  neighborhood    Neighborhood @relation(fields: [neighborhood_id], references: [id])
+
+  @@index([neighborhood_id])
+  @@map("subscribers")
 }

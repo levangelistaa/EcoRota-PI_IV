@@ -19,6 +19,7 @@ model Administrador {
   updated_routes        Route[]        @relation("RouteUpdatedBy")
   created_neighborhoods Neighborhood[] @relation("NeighborhoodCreatedBy")
   updated_neighborhoods Neighborhood[] @relation("NeighborhoodUpdatedBy")
+  resolved_problems     ReportedProblem[] @relation("ProblemResolvedBy")
 
   @@map("administradores")
 }
@@ -78,6 +79,30 @@ model Subscriber {
   neighborhood_id Int
   neighborhood    Neighborhood @relation(fields: [neighborhood_id], references: [id])
 
+  reported_problems ReportedProblem[]
+
   @@index([neighborhood_id])
   @@map("subscribers")
+}
+
+model ReportedProblem {
+  id                 Int      @id @default(autoincrement())
+  problem_type       String
+  description        String
+  status             String
+  url_attachments    String
+  protocol           String
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  subscriber_id Int
+  subscriber    Subscriber @relation(fields: [subscriber_id], references: [id])
+
+  resolved_by_admin_id Int?
+  resolved_by          Administrador? @relation("ProblemResolvedBy", fields: [resolved_by_admin_id], references: [id])
+
+  @@index([status])
+  @@index([protocol])
+  @@index([subscriber_id])
+  @@map("reported_problems")
 }

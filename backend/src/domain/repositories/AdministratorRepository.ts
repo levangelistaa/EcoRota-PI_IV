@@ -1,3 +1,4 @@
+import { Email } from "../value-objects/Email.js";
 import { Administrator } from "../entities/Administrator.js";
 
 export interface AdministratorRepository {

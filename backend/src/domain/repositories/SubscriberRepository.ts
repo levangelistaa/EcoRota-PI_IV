@@ -1,3 +1,4 @@
+import { Email } from "../value-objects/Email.js";
 import { Subscriber } from "../entities/Subscriber.js";
 
 export interface SubscriberRepository {

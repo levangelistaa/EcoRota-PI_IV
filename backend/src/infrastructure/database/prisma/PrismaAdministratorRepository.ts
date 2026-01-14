@@ -1,6 +1,7 @@
 import { PrismaClient } from "../../../../prisma/generated/client/client.js";
 import { Administrator } from "../../../domain/entities/Administrator.js";
 import { AdministratorRepository } from "../../../domain/repositories/AdministratorRepository.js";
+import { Email } from "../../../domain/value-objects/Email.js";
 
 export class PrismaAdministratorRepository implements AdministratorRepository {
   constructor(private prisma: PrismaClient) {}
@@ -9,7 +10,7 @@ export class PrismaAdministratorRepository implements AdministratorRepository {
     const createdAdmin = await this.prisma.administrador.create({
       data: {
         name: data.name,
-        email: data.email,
+        email: data.email.getValue(),
         password: data.password || "",
       },
     });
@@ -17,7 +18,7 @@ export class PrismaAdministratorRepository implements AdministratorRepository {
     return new Administrator(
       createdAdmin.id,
       createdAdmin.name,
-      createdAdmin.email,
+      new Email(createdAdmin.email),
       createdAdmin.password,
       createdAdmin.creation_date,
       createdAdmin.update_date
@@ -34,7 +35,7 @@ export class PrismaAdministratorRepository implements AdministratorRepository {
     return new Administrator(
       admin.id,
       admin.name,
-      admin.email,
+      new Email(admin.email),
       admin.password,
       admin.creation_date,
       admin.update_date
@@ -51,7 +52,7 @@ export class PrismaAdministratorRepository implements AdministratorRepository {
     return new Administrator(
       admin.id,
       admin.name,
-      admin.email,
+      new Email(admin.email),
       admin.password,
       admin.creation_date,
       admin.update_date

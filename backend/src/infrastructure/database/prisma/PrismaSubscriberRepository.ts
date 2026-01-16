@@ -1,6 +1,7 @@
 import { PrismaClient } from "../../../../prisma/generated/client/client.js";
 import { Subscriber } from "../../../domain/entities/Subscriber.js";
 import { SubscriberRepository } from "../../../domain/repositories/SubscriberRepository.js";
+import { Email } from "../../../domain/value-objects/Email.js";
 
 export class PrismaSubscriberRepository implements SubscriberRepository {
     constructor(private prisma: PrismaClient) { }
@@ -8,7 +9,7 @@ export class PrismaSubscriberRepository implements SubscriberRepository {
     async create(data: Omit<Subscriber, "id" | "created_at" | "updated_at">): Promise<Subscriber> {
         const createdSubscriber = await this.prisma.subscriber.create({
             data: {
-                email: data.email,
+                email: data.email.getValue(),
                 address: data.address,
                 neighborhood_id: data.neighborhood_id,
             },
@@ -16,7 +17,7 @@ export class PrismaSubscriberRepository implements SubscriberRepository {
 
         return new Subscriber(
             createdSubscriber.id,
-            createdSubscriber.email,
+            new Email(createdSubscriber.email),
             createdSubscriber.address,
             createdSubscriber.neighborhood_id,
             createdSubscriber.created_at,
@@ -33,7 +34,7 @@ export class PrismaSubscriberRepository implements SubscriberRepository {
 
         return new Subscriber(
             subscriber.id,
-            subscriber.email,
+            new Email(subscriber.email),
             subscriber.address,
             subscriber.neighborhood_id,
             subscriber.created_at,
@@ -50,7 +51,7 @@ export class PrismaSubscriberRepository implements SubscriberRepository {
 
         return new Subscriber(
             subscriber.id,
-            subscriber.email,
+            new Email(subscriber.email),
             subscriber.address,
             subscriber.neighborhood_id,
             subscriber.created_at,
@@ -65,7 +66,7 @@ export class PrismaSubscriberRepository implements SubscriberRepository {
             (subscriber) =>
                 new Subscriber(
                     subscriber.id,
-                    subscriber.email,
+                    new Email(subscriber.email),
                     subscriber.address,
                     subscriber.neighborhood_id,
                     subscriber.created_at,
@@ -83,7 +84,7 @@ export class PrismaSubscriberRepository implements SubscriberRepository {
             (subscriber) =>
                 new Subscriber(
                     subscriber.id,
-                    subscriber.email,
+                    new Email(subscriber.email),
                     subscriber.address,
                     subscriber.neighborhood_id,
                     subscriber.created_at,
@@ -96,7 +97,7 @@ export class PrismaSubscriberRepository implements SubscriberRepository {
         const updatedSubscriber = await this.prisma.subscriber.update({
             where: { id },
             data: {
-                email: data.email,
+                email: data.email?.getValue(),
                 address: data.address,
                 neighborhood_id: data.neighborhood_id,
             },
@@ -104,7 +105,7 @@ export class PrismaSubscriberRepository implements SubscriberRepository {
 
         return new Subscriber(
             updatedSubscriber.id,
-            updatedSubscriber.email,
+            new Email(updatedSubscriber.email),
             updatedSubscriber.address,
             updatedSubscriber.neighborhood_id,
             updatedSubscriber.created_at,

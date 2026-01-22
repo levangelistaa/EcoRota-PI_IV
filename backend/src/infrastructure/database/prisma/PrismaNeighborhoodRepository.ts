@@ -2,6 +2,8 @@ import { PrismaClient } from "../../../../prisma/generated/client/client.js";
 import { Neighborhood } from "../../../domain/entities/Neighborhood.js";
 import { NeighborhoodRepository } from "../../../domain/repositories/NeighborhoodRepository.js";
 import { PopulationEstimate } from "../../../domain/value-objects/PopulationEstimate.js";
+import { PostalCode } from "../../../domain/value-objects/PostalCode.js";
+import { GeoLocation } from "../../../domain/value-objects/GeoLocation.js";
 
 export class PrismaNeighborhoodRepository implements NeighborhoodRepository {
     constructor(private prisma: PrismaClient) { }
@@ -10,10 +12,10 @@ export class PrismaNeighborhoodRepository implements NeighborhoodRepository {
         const createdNeighborhood = await this.prisma.neighborhood.create({
             data: {
                 name: data.name,
-                latitude: data.latitude,
-                longitude: data.longitude,
-                cep: data.cep,
                 population_estimate: data.populationEstimate.getValue(),
+                cep: data.postalCode.getValue(),
+                latitude: data.geoLocation.getLatitude(),
+                longitude: data.geoLocation.getLongitude(),
                 route_id: data.route_id,
                 admin_id_created: data.admin_id_created,
                 admin_id_updated: data.admin_id_updated,
@@ -23,10 +25,9 @@ export class PrismaNeighborhoodRepository implements NeighborhoodRepository {
         return new Neighborhood(
             createdNeighborhood.id,
             createdNeighborhood.name,
-            createdNeighborhood.latitude,
-            createdNeighborhood.longitude,
-            createdNeighborhood.cep,
             new PopulationEstimate(createdNeighborhood.population_estimate),
+            new PostalCode(createdNeighborhood.cep),
+            new GeoLocation(createdNeighborhood.latitude, createdNeighborhood.longitude),
             createdNeighborhood.created_at,
             createdNeighborhood.updated_at,
             createdNeighborhood.route_id,
@@ -45,10 +46,9 @@ export class PrismaNeighborhoodRepository implements NeighborhoodRepository {
         return new Neighborhood(
             neighborhood.id,
             neighborhood.name,
-            neighborhood.latitude,
-            neighborhood.longitude,
-            neighborhood.cep,
             new PopulationEstimate(neighborhood.population_estimate),
+            new PostalCode(neighborhood.cep),
+            new GeoLocation(neighborhood.latitude, neighborhood.longitude),
             neighborhood.created_at,
             neighborhood.updated_at,
             neighborhood.route_id,
@@ -65,10 +65,9 @@ export class PrismaNeighborhoodRepository implements NeighborhoodRepository {
                 new Neighborhood(
                     neighborhood.id,
                     neighborhood.name,
-                    neighborhood.latitude,
-                    neighborhood.longitude,
-                    neighborhood.cep,
                     new PopulationEstimate(neighborhood.population_estimate),
+                    new PostalCode(neighborhood.cep),
+                    new GeoLocation(neighborhood.latitude, neighborhood.longitude),
                     neighborhood.created_at,
                     neighborhood.updated_at,
                     neighborhood.route_id,
@@ -88,10 +87,9 @@ export class PrismaNeighborhoodRepository implements NeighborhoodRepository {
                 new Neighborhood(
                     neighborhood.id,
                     neighborhood.name,
-                    neighborhood.latitude,
-                    neighborhood.longitude,
-                    neighborhood.cep,
                     new PopulationEstimate(neighborhood.population_estimate),
+                    new PostalCode(neighborhood.cep),
+                    new GeoLocation(neighborhood.latitude, neighborhood.longitude),
                     neighborhood.created_at,
                     neighborhood.updated_at,
                     neighborhood.route_id,
@@ -106,10 +104,10 @@ export class PrismaNeighborhoodRepository implements NeighborhoodRepository {
             where: { id },
             data: {
                 name: data.name,
-                latitude: data.latitude,
-                longitude: data.longitude,
-                cep: data.cep,
                 population_estimate: data.populationEstimate?.getValue(),
+                cep: data.postalCode?.getValue(),
+                latitude: data.geoLocation?.getLatitude(),
+                longitude: data.geoLocation?.getLongitude(),
                 route_id: data.route_id,
                 admin_id_updated: data.admin_id_updated,
             },
@@ -118,10 +116,9 @@ export class PrismaNeighborhoodRepository implements NeighborhoodRepository {
         return new Neighborhood(
             updatedNeighborhood.id,
             updatedNeighborhood.name,
-            updatedNeighborhood.latitude,
-            updatedNeighborhood.longitude,
-            updatedNeighborhood.cep,
             new PopulationEstimate(updatedNeighborhood.population_estimate),
+            new PostalCode(updatedNeighborhood.cep),
+            new GeoLocation(updatedNeighborhood.latitude, updatedNeighborhood.longitude),
             updatedNeighborhood.created_at,
             updatedNeighborhood.updated_at,
             updatedNeighborhood.route_id,

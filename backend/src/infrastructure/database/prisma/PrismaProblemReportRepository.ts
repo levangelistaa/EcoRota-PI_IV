@@ -1,6 +1,7 @@
 import { PrismaClient } from "../../../../prisma/generated/client/client.js";
 import { ProblemReport } from "../../../domain/entities/ProblemReport.js";
 import { ProblemReportRepository } from "../../../domain/repositories/ProblemReportRepository.js";
+import { ProblemAttachments } from "../../../domain/value-objects/ProblemAttachments.js";
 
 export class PrismaProblemReportRepository implements ProblemReportRepository {
   constructor(private prisma: PrismaClient) {}
@@ -11,7 +12,7 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
         problem_type: data.problem_type,
         description: data.description,
         status: data.status,
-        url_attachments: data.url_attachments,
+        url_attachments: data.attachments.serialize(),
         protocol: data.protocol,
         subscriber_id: data.subscriber_id,
         resolved_by_admin_id: data.resolved_by_admin_id,
@@ -23,7 +24,7 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
       createdProblem.problem_type,
       createdProblem.description,
       createdProblem.status,
-      createdProblem.url_attachments,
+      new ProblemAttachments(createdProblem.url_attachments),
       createdProblem.protocol,
       createdProblem.created_at,
       createdProblem.updated_at,
@@ -44,7 +45,7 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
       problem.problem_type,
       problem.description,
       problem.status,
-      problem.url_attachments,
+      new ProblemAttachments(problem.url_attachments),
       problem.protocol,
       problem.created_at,
       problem.updated_at,
@@ -65,7 +66,7 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
           problem.problem_type,
           problem.description,
           problem.status,
-          problem.url_attachments,
+          new ProblemAttachments(problem.url_attachments),
           problem.protocol,
           problem.created_at,
           problem.updated_at,
@@ -85,7 +86,7 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
           problem.problem_type,
           problem.description,
           problem.status,
-          problem.url_attachments,
+          new ProblemAttachments(problem.url_attachments),
           problem.protocol,
           problem.created_at,
           problem.updated_at,
@@ -111,7 +112,7 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
       updatedProblem.problem_type,
       updatedProblem.description,
       updatedProblem.status,
-      updatedProblem.url_attachments,
+      new ProblemAttachments(updatedProblem.url_attachments),
       updatedProblem.protocol,
       updatedProblem.created_at,
       updatedProblem.updated_at,

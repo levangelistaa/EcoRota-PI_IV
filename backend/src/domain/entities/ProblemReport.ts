@@ -1,9 +1,11 @@
+import { ProblemStatus } from "../value-objects/ProblemStatus.js";
+
 export class ProblemReport {
   constructor(
     public readonly id: number,
     public problem_type: string,
     public description: string,
-    public status: string,
+    public status: ProblemStatus,
     public url_attachments: string,
     public protocol: string,
     public readonly created_at: Date,

@@ -1,6 +1,7 @@
 import { PrismaClient } from "../../../../prisma/generated/client/client.js";
 import { ProblemReport } from "../../../domain/entities/ProblemReport.js";
 import { ProblemReportRepository } from "../../../domain/repositories/ProblemReportRepository.js";
+import { ProblemStatus } from "../../../domain/value-objects/ProblemStatus.js";
 
 export class PrismaProblemReportRepository implements ProblemReportRepository {
   constructor(private prisma: PrismaClient) {}
@@ -10,7 +11,7 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
       data: {
         problem_type: data.problem_type,
         description: data.description,
-        status: data.status,
+        status: data.status.getValue(),
         url_attachments: data.url_attachments,
         protocol: data.protocol,
         subscriber_id: data.subscriber_id,
@@ -22,7 +23,7 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
       createdProblem.id,
       createdProblem.problem_type,
       createdProblem.description,
-      createdProblem.status,
+      new ProblemStatus(createdProblem.status),
       createdProblem.url_attachments,
       createdProblem.protocol,
       createdProblem.created_at,
@@ -43,7 +44,7 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
       problem.id,
       problem.problem_type,
       problem.description,
-      problem.status,
+      new ProblemStatus(problem.status),
       problem.url_attachments,
       problem.protocol,
       problem.created_at,
@@ -64,7 +65,7 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
           problem.id,
           problem.problem_type,
           problem.description,
-          problem.status,
+          new ProblemStatus(problem.status),
           problem.url_attachments,
           problem.protocol,
           problem.created_at,
@@ -84,7 +85,7 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
           problem.id,
           problem.problem_type,
           problem.description,
-          problem.status,
+          new ProblemStatus(problem.status),
           problem.url_attachments,
           problem.protocol,
           problem.created_at,
@@ -95,11 +96,11 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
     );
   }
 
-  async updateStatus(id: number, status: string, resolvedByAdminId?: number): Promise<ProblemReport | null> {
+  async updateStatus(id: number, status: ProblemStatus, resolvedByAdminId?: number): Promise<ProblemReport | null> {
     const updatedProblem = await this.prisma.reportedProblem.update({
       where: { id },
       data: {
-        status,
+        status: status.getValue(),
         resolved_by_admin_id: resolvedByAdminId,
       },
     });
@@ -110,7 +111,7 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
       updatedProblem.id,
       updatedProblem.problem_type,
       updatedProblem.description,
-      updatedProblem.status,
+      new ProblemStatus(updatedProblem.status),
       updatedProblem.url_attachments,
       updatedProblem.protocol,
       updatedProblem.created_at,

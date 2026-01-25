@@ -31,9 +31,6 @@ export class Address {
         if (!props.street || props.street.trim().length === 0) {
             throw new InvalidAddressError("A rua é obrigatória");
         }
-        if (!props.number || props.number.trim().length === 0) {
-            throw new InvalidAddressError("O número é obrigatório");
-        }
     }
 
     public getStreet(): string {

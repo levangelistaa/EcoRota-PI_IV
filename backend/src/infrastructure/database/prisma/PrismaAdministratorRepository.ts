@@ -9,7 +9,7 @@ import { PersistenceError } from "../../../domain/errors/persistence/Persistence
 export class PrismaAdministratorRepository implements AdministratorRepository {
   constructor(private prisma: PrismaClient) { }
 
-  async create(data: Omit<Administrator, "id" | "creationDate" | "updateDate">): Promise<Administrator> {
+  async create(data: Omit<Administrator, "id" | "createdAt" | "updatedAt">): Promise<Administrator> {
     try {
       const createdAdmin = await this.prisma.administrador.create({
         data: {
@@ -100,7 +100,7 @@ export class PrismaAdministratorRepository implements AdministratorRepository {
     }
   }
 
-  async update(id: number, data: Partial<Omit<Administrator, "id" | "creationDate">>): Promise<Administrator> {
+  async update(id: number, data: Partial<Omit<Administrator, "id" | "createdAt">>): Promise<Administrator> {
     try {
       const updatedAdmin = await this.prisma.administrador.update({
         where: { id },

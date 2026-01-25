@@ -6,7 +6,7 @@ export interface AdministratorRepository {
    * @throws {ConflictError} Se o e-mail já estiver em uso.
    * @throws {PersistenceError} Se ocorrer uma falha técnica na persistência.
    */
-  create(admin: Omit<Administrator, "id" | "creationDate" | "updateDate">): Promise<Administrator>;
+  create(admin: Omit<Administrator, "id" | "createdAt" | "updatedAt">): Promise<Administrator>;
   
   /**
    * Retorna null se o administrador não for encontrado.
@@ -31,7 +31,7 @@ export interface AdministratorRepository {
    * @throws {ConflictError} Se tentar atualizar para um e-mail que já pertence a outro administrador.
    * @throws {PersistenceError} Se ocorrer uma falha técnica na persistência.
    */
-  update(id: number, data: Partial<Omit<Administrator, "id" | "creationDate">>): Promise<Administrator>;
+  update(id: number, data: Partial<Omit<Administrator, "id" | "createdAt">>): Promise<Administrator>;
 
   /**
    * @throws {EntityNotFoundError} Se o administrador não existir para deleção.

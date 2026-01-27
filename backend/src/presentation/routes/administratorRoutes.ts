@@ -7,6 +7,7 @@ import { PrismaAdministratorRepository } from "../../infrastructure/database/pri
 import { prisma } from "../../infrastructure/database/prismaClient.js";
 import { BCryptHashProvider } from "../../infrastructure/providers/BCryptHashProvider.js";
 import { JwtTokenProvider } from "../../infrastructure/providers/JwtTokenProvider.js";
+import { ensureAuthenticated } from "../../infrastructure/http/middlewares/EnsureAuthenticated.js";
 
 const administratorRoutes = Router();
 
@@ -19,6 +20,8 @@ const createAdministratorUseCase = new CreateAdministratorUseCase(administratorR
 const authenticateAdministratorUseCase = new AuthenticateAdministratorUseCase(administratorRepository, hashProvider, tokenProvider);
 const listAdministratorsUseCase = new ListAdministratorsUseCase(administratorRepository);
 
+const authenticated = ensureAuthenticated(tokenProvider, administratorRepository);
+
 const administratorController = new AdministratorController(
     createAdministratorUseCase,
     authenticateAdministratorUseCase,
@@ -26,8 +29,8 @@ const administratorController = new AdministratorController(
 );
 
 // Mapeamento de Rotas
-administratorRoutes.post("/administrators", (req, res) => administratorController.register(req, res));
+administratorRoutes.post("/administrators", authenticated, (req, res) => administratorController.register(req, res));
 administratorRoutes.post("/auth/login", (req, res) => administratorController.login(req, res));
-administratorRoutes.get("/administrators", (req, res) => administratorController.list(req, res));
+administratorRoutes.get("/administrators", authenticated, (req, res) => administratorController.list(req, res));
 
 export { administratorRoutes };

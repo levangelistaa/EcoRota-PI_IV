@@ -5,6 +5,8 @@ import { EntityNotFoundError } from "../../../domain/errors/persistence/EntityNo
 import { ConflictError } from "../../../domain/errors/persistence/ConflictError.js";
 import { InvalidEmailError } from "../../../domain/errors/InvalidEmailError.js";
 import { InvalidAddressError } from "../../../domain/errors/InvalidAddressError.js";
+import { InvalidTokenError } from "../../../domain/errors/providers/InvalidTokenError.js";
+import { InvalidCredentialsError } from "../../../application/use-cases/administrator/errors/InvalidCredentialsError.js";
 
 /**
  * @function ErrorHandler
@@ -23,6 +25,11 @@ export const ErrorHandler = (
         error.name.startsWith("Invalid")
     ) {
         return res.status(400).json({ error: error.message });
+    }
+
+    // Erros de Autenticação (401 Unauthorized)
+    if (error instanceof InvalidTokenError || error instanceof InvalidCredentialsError) {
+        return res.status(401).json({ error: error.message });
     }
 
     // Erros de Entidade Não Encontrada (404 Not Found)

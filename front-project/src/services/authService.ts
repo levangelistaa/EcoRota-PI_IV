@@ -17,12 +17,18 @@ export interface AuthResponse {
 
 export const authService = {
   async login(credentials: LoginRequest): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>('/sessions', credentials);
+    const response = await api.post<AuthResponse>('/auth/login', credentials);
+    
+    if (response.data.token) {
+      localStorage.setItem('@EcoRota:token', response.data.token);
+      localStorage.setItem('@EcoRota:user', JSON.stringify(response.data.user));
+    }
+    
     return response.data;
   },
 
   async logout(): Promise<void> {
-    // Lógica de logout (remover tokens, etc)
     localStorage.removeItem('@EcoRota:token');
+    localStorage.removeItem('@EcoRota:user');
   }
 };

@@ -1,15 +1,28 @@
 import React, { useState } from 'react';
 import { FaLock, FaEnvelope, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const AdminLogin: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState('');
+    
+    const { signIn } = useAuth();
+    const navigate = useNavigate();
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Login attempt:', { email, password });
-        // Lógica de login será implementada posteriormente na integração com a API
+        setError('');
+        
+        try {
+            await signIn({ email, password });
+            navigate('/admin/dashboard');
+        } catch (err) {
+            console.error(err);
+            setError('Falha no login. Verifique suas credenciais.');
+        }
     };
 
     return (
@@ -25,6 +38,12 @@ const AdminLogin: React.FC = () => {
                     </div>
 
                     <form onSubmit={handleSubmit}>
+                        {error && (
+                            <div className="alert alert-danger d-flex align-items-center mb-3" role="alert">
+                                <div>{error}</div>
+                            </div>
+                        )}
+
                         <div className="mb-3">
                             <label htmlFor="email" className="form-label small fw-bold text-secondary text-uppercase">E-mail Corporativo</label>
                             <div className="input-group">
@@ -75,9 +94,9 @@ const AdminLogin: React.FC = () => {
                         </button>
 
                         <div className="text-center">
-                            <a href="/" className="text-decoration-none small text-secondary">
+                            <Link to="/" className="text-decoration-none small text-secondary">
                                 Voltar para a Home
-                            </a>
+                            </Link>
                         </div>
                     </form>
                 </div>

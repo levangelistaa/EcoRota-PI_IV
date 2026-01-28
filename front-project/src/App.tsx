@@ -1,4 +1,4 @@
-import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header'
 import Footer from './components/Footer'
 import Navbar from './components/Navbar'
@@ -23,29 +23,42 @@ function ScrollToHash() {
   return null;
 }
 
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import Dashboard from './pages/admin/Dashboard';
+
 function App() {
-
   return (
-    <Router>
-      <ScrollToHash />
-      <div className="App">
+    <AuthProvider>
+      <Router>
+        <ScrollToHash />
+        <div className="App">
+          <Header />
+          <Navbar />
 
-        <Header />
-        <Navbar />
+          <div className="content">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/informacoes" element={<Info />} />
+              <Route path="/ecopontos" element={<Ecoponto />} />
+              <Route path="/admin-login" element={<AdminLogin />} />
 
-        <div className="content">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/informacoes" element={< Info/>} />
-            <Route path="/ecopontos" element={<Ecoponto/>} />
-            <Route path="/admin-login" element={<AdminLogin />} />
-          </Routes>
+              {/* Protected Admin Routes */}
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </div>
+          <Footer />
         </div>
-        <Footer />
-      </div>
-
-    </Router>
-  )
+      </Router>
+    </AuthProvider>
+  );
 }
 
 export default App

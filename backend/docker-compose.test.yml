@@ -3,6 +3,7 @@ services:
     image: mariadb:11
     environment:
       MARIADB_ROOT_PASSWORD: root
+      MARIADB_ROOT_HOST: "%"
       MARIADB_DATABASE: ecorota_test
       MARIADB_USER: ecorota
       MARIADB_PASSWORD: ecorota

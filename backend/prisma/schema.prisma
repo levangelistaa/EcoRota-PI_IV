@@ -91,6 +91,7 @@ model Subscriber {
 model Ecopoint {
   id                 Int            @id @default(autoincrement())
   name               String
+  partner_name       String?        @ecorota.VarChar(255)
   accepted_materials String
   collection_days    String
   collection_time    String
@@ -99,12 +100,8 @@ model Ecopoint {
   neighborhood_id    Int
   admin_id_created   Int
   admin_id_updated   Int?
-  complement         String?
-  latitude           Float?
-  longitude          Float?
-  number             String?
-  postal_code        String?
-  street             String
+  latitude           Float
+  longitude          Float
   created_by         Administrador  @relation("EcopointCreatedBy", fields: [admin_id_created], references: [id])
   updated_by         Administrador? @relation("EcopointUpdatedBy", fields: [admin_id_updated], references: [id])
   neighborhood       Neighborhood   @relation(fields: [neighborhood_id], references: [id])

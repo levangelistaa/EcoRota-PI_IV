@@ -19,6 +19,10 @@ app.use(express.json());
 import { administratorRoutes } from "./presentation/routes/administratorRoutes.js";
 app.use(administratorRoutes);
 
+// Rotas de Assinantes (Subscribers)
+import { subscriberRoutes } from "./presentation/routes/subscriberRoutes.js";
+app.use(subscriberRoutes);
+
 // Rota de Health Check
 app.get("/ping", (req, res) => {
     res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });

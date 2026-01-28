@@ -38,8 +38,8 @@ const authMiddleware = ensureAuthenticated(tokenProvider, administratorRepositor
 
 // Mapeamento de Rotas
 subscriberRoutes.post("/subscribers", (req, res) => subscriberController.register(req, res));
-subscriberRoutes.get("/subscribers", authMiddleware, (req, res) => subscriberController.list(req, res));
-subscriberRoutes.get("/subscribers/:id", authMiddleware, (req, res) => subscriberController.findById(req, res));
+subscriberRoutes.get("/subscribers", (req, res) => subscriberController.list(req, res));
+subscriberRoutes.get("/subscribers/:id", (req, res) => subscriberController.findById(req, res));
 subscriberRoutes.put("/subscribers/:id", authMiddleware, (req, res) => subscriberController.update(req, res));
 subscriberRoutes.delete("/subscribers/:id", authMiddleware, (req, res) => subscriberController.delete(req, res));
 

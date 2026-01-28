@@ -1,8 +1,8 @@
-import { prisma } from "../../src/infrastructure/database/prismaClient.js";
-import { PrismaNeighborhoodRepository } from "../../src/infrastructure/database/prisma/PrismaNeighborhoodRepository.js";
-import { PrismaRouteRepository } from "../../src/infrastructure/database/prisma/PrismaRouteRepository.js";
-import { CreateNeighborhoodUseCase } from "../../src/application/use-cases/neighborhood/CreateNeighborhoodUseCase.js";
-import { resetDatabase } from "../setup-db.js";
+import { prisma } from "../../../src/infrastructure/database/prismaClient.js";
+import { PrismaNeighborhoodRepository } from "../../../src/infrastructure/database/prisma/PrismaNeighborhoodRepository.js";
+import { PrismaRouteRepository } from "../../../src/infrastructure/database/prisma/PrismaRouteRepository.js";
+import { CreateNeighborhoodUseCase } from "../../../src/application/use-cases/neighborhood/CreateNeighborhoodUseCase.js";
+import { resetDatabase } from "../../setup-db.js";
 
 describe("Integration: CreateNeighborhoodUseCase + Prisma (DB real)", () => {
   beforeAll(async () => {

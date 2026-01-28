@@ -22,6 +22,9 @@ app.use(administratorRoutes);
 // Rotas de Assinantes (Subscribers)
 import { subscriberRoutes } from "./presentation/routes/subscriberRoutes.js";
 app.use(subscriberRoutes);
+// Rotas de Bairros (Neighborhoods)
+import { neighborhoodRoutes } from "./presentation/routes/neighborhoodRoutes.js";
+app.use(neighborhoodRoutes);
 
 // Rota de Health Check
 app.get("/ping", (req, res) => {

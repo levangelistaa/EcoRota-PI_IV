@@ -75,8 +75,8 @@ describe("Integration: UpdateSubscriberProfileUseCase + Prisma (DB real)", () =>
     );
 
     const updated = await updateUsecase.execute(created.id, {
-      email: "usuario+novo@teste.com",
-      street: "Rua B",
+      email: "JeffersonLima@teste.com",
+      street: "Rua Xesquedele",
       number: "456",
       complement: "AP 101",
       postalCode: "63700222",
@@ -85,15 +85,15 @@ describe("Integration: UpdateSubscriberProfileUseCase + Prisma (DB real)", () =>
     });
 
     expect(updated.id).toBe(created.id);
-    expect(updated.email).toBe("usuario+novo@teste.com");
+    expect(updated.email).toBe("jeffersonlima@teste.com");
 
     const subscriberDb = await prisma.subscriber.findUnique({
       where: { id: created.id },
     });
 
     expect(subscriberDb).not.toBeNull();
-    expect(subscriberDb?.email).toBe("usuario+novo@teste.com");
-    expect(subscriberDb?.street).toBe("Rua B");
+    expect(subscriberDb?.email).toBe("jeffersonlima@teste.com");
+    expect(subscriberDb?.street).toBe("Rua Xesquedele");
     expect(subscriberDb?.number).toBe("456");
     expect(subscriberDb?.complement).toBe("AP 101");
     expect(subscriberDb?.postal_code).toBe("63700222");

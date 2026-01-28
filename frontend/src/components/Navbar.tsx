@@ -19,7 +19,7 @@ function Navbar() {
     };
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm" style={{ borderTop: '4px solid #4CAF50' }}>
+        <nav className="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm navbar-top-border">
             <div className="container">
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span className="navbar-toggler-icon"></span>

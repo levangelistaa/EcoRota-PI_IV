@@ -1,72 +1,72 @@
 import React, { useEffect, useState } from 'react';
-import { neighborhoodService } from '../../services/neighborhoodService';
-import { routeService, type Route } from '../../services/routeService';
-import type { Neighborhood } from '../../services/neighborhoodService';
+import { routeService } from '../../services/routeService';
+import type { Route } from '../../services/routeService';
 import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import ConfirmModal from '../../components/common/ConfirmModal';
 
-const NeighborhoodsList: React.FC = () => {
-    const [neighborhoods, setNeighborhoods] = useState<Neighborhood[]>([]);
+const RoutesList: React.FC = () => {
     const [routes, setRoutes] = useState<Route[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; id?: number }>({ isOpen: false });
 
     useEffect(() => {
-        loadNeighborhoods();
+        loadRoutes();
     }, []);
 
-    async function loadNeighborhoods() {
+    async function loadRoutes() {
         try {
-            const [neighborhoodsData, routesData] = await Promise.all([
-                neighborhoodService.list(),
-                routeService.list()
-            ]);
-            setNeighborhoods(neighborhoodsData);
-            setRoutes(routesData);
+            const data = await routeService.list();
+            setRoutes(data);
         } catch (error) {
-            console.error('Erro ao carregar dados:', error);
-            toast.error('Não foi possível carregar os dados.');
+            console.error('Erro ao carregar rotas:', error);
+            toast.error('Não foi possível carregar a lista de rotas.');
         } finally {
             setLoading(false);
         }
     }
 
-    const getRouteName = (routeId: number) => {
-        return routes.find(r => r.id === routeId)?.name || `Rota ${routeId}`;
-    };
-
     async function handleDeleteConfirmed() {
         if (!deleteModal.id) return;
-        
+
         try {
-            await neighborhoodService.delete(deleteModal.id);
-            setNeighborhoods(neighborhoods.filter(n => n.id !== deleteModal.id));
-            toast.success('Bairro excluído com sucesso!');
+            await routeService.delete(deleteModal.id);
+            setRoutes(routes.filter(r => r.id !== deleteModal.id));
+            toast.success('Rota excluída com sucesso!');
         } catch (error: any) {
             console.error('Erro ao excluir:', error);
-            const message = error.response?.data?.error || 'Erro ao excluir bairro.';
+            const message = error.response?.data?.error || 'Erro ao excluir rota.';
             toast.error(message);
         } finally {
             setDeleteModal({ isOpen: false });
         }
     }
 
-    const filteredNeighborhoods = neighborhoods.filter(n => 
-        n.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        n.postalCode.includes(searchTerm)
+    const filteredRoutes = routes.filter(r =>
+        r.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        r.collectionType.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const daysMap: { [key: string]: string } = {
+        'monday': 'Segunda-feira',
+        'tuesday': 'Terça-feira',
+        'wednesday': 'Quarta-feira',
+        'thursday': 'Quinta-feira',
+        'friday': 'Sexta-feira',
+        'saturday': 'Sábado',
+        'sunday': 'Domingo'
+    };
 
     if (loading) return <div className="text-center p-5"><div className="spinner-border text-success"></div></div>;
 
     return (
         <div className="container py-5">
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="fw-bold">Gestão de Bairros</h2>
-                <Link to="/admin/neighborhoods/new" className="btn btn-success d-flex align-items-center gap-2 rounded-pill px-4">
-                    <FaPlus /> Novo Bairro
+                <h2 className="fw-bold">Gestão de Rotas</h2>
+                <Link to="/admin/routes/new" className="btn btn-success d-flex align-items-center gap-2 rounded-pill px-4">
+                    <FaPlus /> Nova Rota
                 </Link>
             </div>
 
@@ -74,44 +74,45 @@ const NeighborhoodsList: React.FC = () => {
                 <div className="p-4 bg-light border-bottom">
                     <div className="input-group mw-400">
                         <span className="input-group-text bg-white border-end-0"><FaSearch className="text-muted" /></span>
-                        <input 
-                            type="text" 
-                            className="form-control border-start-0" 
-                            placeholder="Buscar por nome ou CEP..." 
+                        <input
+                            type="text"
+                            className="form-control border-start-0"
+                            placeholder="Buscar por nome ou tipo..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
                         />
                     </div>
                 </div>
+
                 <div className="table-responsive">
                     <table className="table table-hover mb-0 align-middle">
                         <thead className="bg-light">
                             <tr>
                                 <th className="ps-4">Nome</th>
-                                <th>CEP</th>
-                                <th>Pop. Estimada</th>
-                                <th>Nome da Rota</th>
+                                <th>Tipo de Coleta</th>
+                                <th>Dias</th>
+                                <th>Horário</th>
                                 <th className="text-end pe-4">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredNeighborhoods.map(neighborhood => (
-                                <tr key={neighborhood.id}>
-                                    <td className="ps-4 fw-bold">{neighborhood.name}</td>
-                                    <td>{neighborhood.postalCode}</td>
-                                    <td>{neighborhood.populationEstimate?.toLocaleString('pt-BR') || '-'}</td>
-                                    <td><span className="badge bg-primary rounded-pill">{getRouteName(neighborhood.routeId)}</span></td>
+                            {filteredRoutes.map(route => (
+                                <tr key={route.id}>
+                                    <td className="ps-4 fw-bold">{route.name}</td>
+                                    <td><span className="badge bg-info">{route.collectionType}</span></td>
+                                    <td>{route.collectionDays.map(day => daysMap[day] || day).join(', ')}</td>
+                                    <td>{route.startTime} - {route.endTime}</td>
                                     <td className="text-end pe-4">
                                         <div className="d-flex justify-content-end gap-2">
                                             <Link 
-                                                to={`/admin/neighborhoods/${neighborhood.id}/edit`} 
+                                                to={`/admin/routes/${route.id}/edit`} 
                                                 className="btn btn-sm btn-outline-primary btn-circle-sm rounded-circle d-flex align-items-center justify-content-center"
                                                 title="Editar"
                                             >
                                                 <FaEdit />
                                             </Link>
                                             <button 
-                                                onClick={() => setDeleteModal({ isOpen: true, id: neighborhood.id })} 
+                                                onClick={() => setDeleteModal({ isOpen: true, id: route.id })} 
                                                 className="btn btn-sm btn-outline-danger btn-circle-sm rounded-circle d-flex align-items-center justify-content-center"
                                                 title="Excluir"
                                             >
@@ -121,10 +122,10 @@ const NeighborhoodsList: React.FC = () => {
                                     </td>
                                 </tr>
                             ))}
-                            {filteredNeighborhoods.length === 0 && (
+                            {filteredRoutes.length === 0 && (
                                 <tr>
                                     <td colSpan={5} className="text-center py-5 text-muted">
-                                        Nenhum bairro encontrado.
+                                        Nenhuma rota encontrada.
                                     </td>
                                 </tr>
                             )}
@@ -135,8 +136,8 @@ const NeighborhoodsList: React.FC = () => {
 
             <ConfirmModal 
                 isOpen={deleteModal.isOpen}
-                title="Excluir Bairro"
-                message="Tem certeza que deseja excluir este bairro? Esta ação não pode ser desfeita."
+                title="Excluir Rota"
+                message="Tem certeza que deseja excluir esta rota? Esta ação não pode ser desfeita."
                 onConfirm={handleDeleteConfirmed}
                 onCancel={() => setDeleteModal({ isOpen: false })}
             />
@@ -144,4 +145,4 @@ const NeighborhoodsList: React.FC = () => {
     );
 };
 
-export default NeighborhoodsList;
+export default RoutesList;

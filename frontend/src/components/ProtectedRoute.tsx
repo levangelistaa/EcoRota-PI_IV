@@ -11,7 +11,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+      <div className="d-flex justify-content-center align-items-center h-100vh">
         <div className="spinner-border text-success" role="status">
           <span className="visually-hidden">Carregando...</span>
         </div>

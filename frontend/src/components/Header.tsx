@@ -8,14 +8,14 @@ function Header() {
         <img
           src={logo}
           alt="Logo Recicratiú"
-          style={{ width: '130px', height: 'auto' }}
+          className="logo-sm"
         />
 
         <div className="text-center text-md-start">
-          <h1 className="fw-bolder mb-0" style={{ color: '#2e7d32'}}>
+          <h1 className="fw-bolder mb-0 text-green-main">
             RECICRATIÚ
           </h1>
-          <h2 className="fs-5 text-secondary mb-0 fw-medium" style={{ maxWidth: '400px' }}>
+          <h2 className="fs-5 text-secondary mb-0 fw-medium mw-400">
             Associação de Catadores de Materiais Recicláveis de Crateús
           </h2>
         </div>

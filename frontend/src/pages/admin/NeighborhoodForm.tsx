@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { neighborhoodService } from '../../services/neighborhoodService';
+import { routeService, type Route } from '../../services/routeService';
 import { FaSave, FaArrowLeft } from 'react-icons/fa';
+import { toast } from 'react-hot-toast';
 
 const NeighborhoodForm: React.FC = () => {
     const { id } = useParams();
@@ -17,13 +19,27 @@ const NeighborhoodForm: React.FC = () => {
         routeId: ''
     });
 
+    const [routes, setRoutes] = useState<Route[]>([]);
     const [loading, setLoading] = useState(false);
+    const [fetchingRoutes, setFetchingRoutes] = useState(true);
 
     useEffect(() => {
+        loadRoutes();
         if (isEditing) {
             loadNeighborhood();
         }
     }, [id]);
+
+    async function loadRoutes() {
+        try {
+            const data = await routeService.list();
+            setRoutes(data);
+        } catch (error) {
+            console.error('Erro ao carregar rotas:', error);
+        } finally {
+            setFetchingRoutes(false);
+        }
+    }
 
     async function loadNeighborhood() {
         try {
@@ -31,15 +47,27 @@ const NeighborhoodForm: React.FC = () => {
             setForm({
                 name: data.name,
                 populationEstimate: data.populationEstimate?.toString() || '',
-                postalCode: data.postalCode,
+                postalCode: formatCEP(data.postalCode),
                 latitude: data.latitude.toString(),
                 longitude: data.longitude.toString(),
                 routeId: data.routeId.toString()
             });
         } catch (error) {
             console.error('Erro ao carregar bairro:', error);
-            alert('Erro ao carregar dados do bairro.');
+            toast.error('Erro ao carregar dados do bairro.');
         }
+    }
+
+    function formatCEP(value: string) {
+        return value
+            .replace(/\D/g, '')
+            .replace(/(\d{5})(\d)/, '$1-$2')
+            .replace(/(-\d{3})\d+?$/, '$1');
+    }
+
+    function handleCEPChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const formatted = formatCEP(e.target.value);
+        setForm({ ...form, postalCode: formatted });
     }
 
     async function handleSubmit(e: React.FormEvent) {
@@ -49,7 +77,7 @@ const NeighborhoodForm: React.FC = () => {
         const payload = {
             name: form.name,
             populationEstimate: form.populationEstimate ? Number(form.populationEstimate) : null,
-            postalCode: form.postalCode,
+            postalCode: form.postalCode.replace(/\D/g, ''),
             latitude: Number(form.latitude),
             longitude: Number(form.longitude),
             routeId: Number(form.routeId)
@@ -58,15 +86,16 @@ const NeighborhoodForm: React.FC = () => {
         try {
             if (isEditing) {
                 await neighborhoodService.update(Number(id), payload);
-                alert('Bairro atualizado com sucesso!');
+                toast.success('Bairro atualizado com sucesso!');
             } else {
                 await neighborhoodService.create(payload);
-                alert('Bairro criado com sucesso!');
+                toast.success('Bairro criado com sucesso!');
             }
             navigate('/admin/neighborhoods');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Erro ao salvar:', error);
-            alert('Erro ao salvar os dados. Verifique o console.');
+            const message = error.response?.data?.error || 'Erro ao salvar os dados.';
+            toast.error(message);
         } finally {
             setLoading(false);
         }
@@ -105,9 +134,9 @@ const NeighborhoodForm: React.FC = () => {
                                             className="form-control" 
                                             required 
                                             value={form.postalCode}
-                                            onChange={e => setForm({...form, postalCode: e.target.value})}
-                                            maxLength={8}
-                                            placeholder="Apenas números"
+                                            onChange={handleCEPChange}
+                                            maxLength={9}
+                                            placeholder="XXXXX-XXX"
                                         />
                                     </div>
                                     <div className="col-md-6 mb-3">
@@ -147,15 +176,22 @@ const NeighborhoodForm: React.FC = () => {
                                 </div>
 
                                 <div className="mb-4">
-                                    <label className="form-label fw-bold">Rota de Coleta (ID)</label>
-                                    <input 
-                                        type="number" 
-                                        className="form-control" 
+                                    <label className="form-label fw-bold">Rota de Coleta</label>
+                                    <select 
+                                        className="form-select" 
                                         required 
                                         value={form.routeId}
                                         onChange={e => setForm({...form, routeId: e.target.value})}
-                                        placeholder="ID da rota associada"
-                                    />
+                                        disabled={fetchingRoutes}
+                                    >
+                                        <option value="">Selecione uma rota</option>
+                                        {routes.map(route => (
+                                            <option key={route.id} value={route.id}>
+                                                {route.name} ({route.collectionType})
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {fetchingRoutes && <div className="form-text text-muted small mt-1">Carregando rotas...</div>}
                                 </div>
 
                                 <div className="d-grid">

@@ -41,11 +41,38 @@ const Dashboard: React.FC = () => {
             </div>
 
             <div className="card border-0 shadow-sm rounded-4 p-4">
-                <h4 className="fw-bold mb-4">Ações Rápidas</h4>
-                <div className="d-flex gap-3">
-                    <Link to="/admin/neighborhoods/new" className="btn btn-dark py-2 px-4 rounded-pill">Novo Bairro</Link>
-                    <Link to="/admin/subscribers" className="btn btn-dark py-2 px-4 rounded-pill">Ver Assinantes</Link>
-                    <Link to="/admin/users/new" className="btn btn-dark py-2 px-4 rounded-pill">Novo Admin</Link>
+                <h4 className="fw-bold mb-4">Gerenciar Recursos</h4>
+                <div className="row g-3">
+                    <div className="col-md-6 col-lg-4">
+                        <Link to="/admin/neighborhoods" className="btn btn-outline-primary w-100 py-3 rounded-3 d-flex align-items-center justify-content-center gap-2">
+                            <FaMapMarkedAlt /> Bairros
+                        </Link>
+                    </div>
+                    <div className="col-md-6 col-lg-4">
+                        <Link to="/admin/subscribers" className="btn btn-outline-success w-100 py-3 rounded-3 d-flex align-items-center justify-content-center gap-2">
+                            <FaUsers /> Assinantes
+                        </Link>
+                    </div>
+                    <div className="col-md-6 col-lg-4">
+                        <Link to="/admin/users" className="btn btn-outline-dark w-100 py-3 rounded-3 d-flex align-items-center justify-content-center gap-2">
+                            <FaUsers /> Administradores
+                        </Link>
+                    </div>
+                    <div className="col-md-6 col-lg-4">
+                        <Link to="/admin/routes" className="btn btn-outline-info w-100 py-3 rounded-3 d-flex align-items-center justify-content-center gap-2">
+                            <FaMapMarkedAlt /> Rotas
+                        </Link>
+                    </div>
+                    <div className="col-md-6 col-lg-4">
+                        <Link to="/admin/ecopoints" className="btn btn-outline-success w-100 py-3 rounded-3 d-flex align-items-center justify-content-center gap-2">
+                            <FaMapMarkedAlt /> Ecopontos
+                        </Link>
+                    </div>
+                    <div className="col-md-6 col-lg-4">
+                        <Link to="/admin/reports" className="btn btn-outline-warning w-100 py-3 rounded-3 d-flex align-items-center justify-content-center gap-2">
+                            <FaExclamationTriangle /> Problemas Reportados
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>

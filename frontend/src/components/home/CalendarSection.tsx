@@ -1,46 +1,86 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaCalendarAlt } from 'react-icons/fa';
 import CalendarDay from './CalendarDay';
+import { routeService } from '../../services/routeService';
+import { neighborhoodService } from '../../services/neighborhoodService';
+
+interface DaySchedule {
+    day: string;
+    routes: {
+        name: string;
+        neighborhoods: string[];
+    }[];
+}
 
 const CalendarSection: React.FC = () => {
-    const schedule = [
-        {
-            day: "Segunda-feira",
-            routes: [
-                { name: "Rota 01", neighborhoods: ["Tucuns, Queimadas, Marinhos", "Barro Vermelho, Santa Luzia"] },
-                { name: "Rota 02", neighborhoods: ["São José, Ponte Preta, Altamira e Centro"] },
-                { name: "Rota 03", neighborhoods: ["Ibiapaba, Poti, Cabaças e Boqueirão", "Lagoas das Pedras e Estação"] }
-            ]
-        },
-        {
-            day: "Terça-feira",
-            routes: [
-                { name: "Rota 01", neighborhoods: ["Planalto, Planaltina, Morada dos Ventos II", "Campo Verde e Campo Velho"] },
-                { name: "Rota 02", neighborhoods: ["São Vicente, Fatima I", "Várzea Grande, Pocinhos, Boa Vista", "São João e Jardim"] }
-            ]
-        },
-        {
-            day: "Quarta-feira",
-            routes: [
-                { name: "Rota 01", neighborhoods: ["Venâncios", "Pendencia, Salgado, Queimadas, Barro Vermelho e Xavier"] },
-                { name: "Rota 02", neighborhoods: ["Assis e Curral Velho", "Vaca Morta"] }
-            ]
-        },
-        {
-            day: "Quinta-feira",
-            routes: [
-                { name: "Rota 01", neighborhoods: ["Ponto-X, Nova Terra, Rodoviária, Região da CSU e BNB", "Santo Antônio dos Azevedos, Águas Belas e São João"] },
-                { name: "Rota 02", neighborhoods: ["Dom Fragoso, Centro Residencial e Maratoan", "Realejo, Pé do Morro e Barra do Simão"] }
-            ]
-        },
-        {
-            day: "Sexta-feira",
-            routes: [
-                { name: "Rota 01", neighborhoods: ["Curral do Meio, Várzea da Palha", "Realejo, Pé do Morro e Barra do Simão"] },
-                { name: "Rota 02", neighborhoods: ["Cidade Nova, Cajás, Patriarcas e Cidade 2000", "Frei Damião, Vila José Rosa e Vida Nova"] }
-            ]
+    const [schedule, setSchedule] = useState<DaySchedule[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        loadSchedule();
+    }, []);
+
+    async function loadSchedule() {
+        try {
+            const routes = await routeService.list();
+            const neighborhoods = await neighborhoodService.list();
+
+            // Days of the week in order (technical values)
+            const daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+            
+            // Labels for display
+            const dayLabels: Record<string, string> = {
+                monday: 'Segunda-feira',
+                tuesday: 'Terça-feira',
+                wednesday: 'Quarta-feira',
+                thursday: 'Quinta-feira',
+                friday: 'Sexta-feira',
+            };
+            
+            // Group routes by day
+            const scheduleByDay: DaySchedule[] = daysOfWeek.map(day => ({
+                day: dayLabels[day],
+                routes: []
+            }));
+
+            routes.forEach(route => {
+                route.collectionDays.forEach(day => {
+                    const dayIndex = daysOfWeek.indexOf(day);
+                    if (dayIndex !== -1) {
+                        // Find neighborhoods for this route
+                        const routeNeighborhoods = neighborhoods
+                            .filter(n => n.routeId === route.id)
+                            .map(n => n.name);
+
+                        scheduleByDay[dayIndex].routes.push({
+                            name: route.name,
+                            neighborhoods: routeNeighborhoods
+                        });
+                    }
+                });
+            });
+
+            setSchedule(scheduleByDay);
+        } catch (error) {
+            console.error('Erro ao carregar calendário:', error);
+        } finally {
+            setLoading(false);
         }
-    ];
+    }
+
+    if (loading) {
+        return (
+            <section id="calendario-rotas" className="col-lg-8">
+                <div className="card shadow-sm border-0 border-top border-success border-4 p-4">
+                    <div className="text-center py-5">
+                        <div className="spinner-border text-success" role="status">
+                            <span className="visually-hidden">Carregando...</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section id="calendario-rotas" className="col-lg-8">
@@ -49,7 +89,7 @@ const CalendarSection: React.FC = () => {
                     <FaCalendarAlt /> Calendário de Rotas
                 </h2>
 
-                <div className="container-scrollable pe-2" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                <div className="container-scrollable pe-2 max-h-300">
                     <div className="row g-3">
                         {schedule.map((item, index) => (
                             <CalendarDay key={index} day={item.day} routes={item.routes} />

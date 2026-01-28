@@ -30,7 +30,7 @@ const BecomePartner: React.FC = () => {
                         <img
                             src={qrcode}
                             alt="QR Code para contacto"
-                            style={{ width: '180px', height: '180px', objectFit: 'contain' }}
+                            className="img-180"
                         />
                         <p className="text-dark small fw-bold mb-0">Acesse o QR Code para contato direto!</p>
                     </div>

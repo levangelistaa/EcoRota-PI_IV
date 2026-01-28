@@ -16,7 +16,7 @@ const ParticipationSection: React.FC = () => {
                     <div className="col-md-4" key={step.id}>
                         <div className="card h-100 border-0 shadow-sm text-center p-3">
                             <div className="card-body">
-                                <div className="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style={{ width: '60px', height: '60px' }}>{step.id}</div>
+                                <div className="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 circle-60">{step.id}</div>
                                 <h5>{step.title}</h5>
                                 <p className="small text-muted">{step.description}</p>
                             </div>

@@ -4,6 +4,7 @@ import { subscriberService } from '../../services/subscriberService';
 import { neighborhoodService } from '../../services/neighborhoodService';
 import type { Neighborhood } from '../../services/neighborhoodService';
 import { FaSave, FaArrowLeft } from 'react-icons/fa';
+import { toast } from 'react-hot-toast';
 
 const SubscriberForm: React.FC = () => {
     const navigate = useNavigate();
@@ -29,7 +30,7 @@ const SubscriberForm: React.FC = () => {
             setNeighborhoods(data);
         } catch (error) {
             console.error('Erro ao carregar bairros:', error);
-            alert('Não foi possível carregar a lista de bairros.');
+            toast.error('Não foi possível carregar a lista de bairros.');
         }
     }
 
@@ -47,11 +48,11 @@ const SubscriberForm: React.FC = () => {
 
         try {
             await subscriberService.register(payload);
-            alert('Assinante cadastrado com sucesso!');
+            toast.success('Assinante cadastrado com sucesso!');
             navigate('/admin/subscribers');
         } catch (error) {
             console.error('Erro ao salvar:', error);
-            alert('Erro ao cadastrar assinante. Verifique os dados.');
+            toast.error('Erro ao cadastrar assinante. Verifique os dados.');
         } finally {
             setLoading(false);
         }

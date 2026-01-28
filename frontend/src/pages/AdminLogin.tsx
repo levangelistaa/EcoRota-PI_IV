@@ -27,8 +27,8 @@ const AdminLogin: React.FC = () => {
     };
 
     return (
-        <div className="container py-5 d-flex justify-content-center align-items-center" style={{ minHeight: '70vh' }}>
-            <div className="card shadow-lg border-0 border-top border-success border-4 rounded-4" style={{ maxWidth: '400px', width: '100%' }}>
+        <div className="container py-5 d-flex justify-content-center align-items-center min-h-70vh">
+            <div className="card shadow-lg border-0 border-top border-success border-4 rounded-4 mw-400 w-100">
                 <div className="card-body p-5">
                     <div className="text-center mb-4">
                         <div className="bg-dark text-success d-inline-block p-3 rounded-circle shadow-sm mb-3">
@@ -80,9 +80,8 @@ const AdminLogin: React.FC = () => {
                                 />
                                 <button 
                                     type="button"
-                                    className="input-group-text bg-white border-start-0 text-muted"
+                                    className="input-group-text bg-white border-start-0 text-muted cursor-pointer"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    style={{ cursor: 'pointer' }}
                                     aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
                                 >
                                     {showPassword ? <FaEyeSlash /> : <FaEye />}

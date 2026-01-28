@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { authService } from '../../services/authService';
-import { FaUserShield, FaPlus } from 'react-icons/fa';
+import { FaUserShield, FaPlus, FaSearch } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 
 interface AdminUser {
     id: string;
@@ -12,6 +13,7 @@ interface AdminUser {
 const AdminsList: React.FC = () => {
     const [admins, setAdmins] = useState<AdminUser[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         loadAdmins();
@@ -23,11 +25,16 @@ const AdminsList: React.FC = () => {
             setAdmins(data as unknown as AdminUser[]);
         } catch (error) {
             console.error('Erro ao carregar administradores:', error);
-            alert('Não foi possível carregar a lista de administradores.');
+            toast.error('Não foi possível carregar a lista de administradores.');
         } finally {
             setLoading(false);
         }
     }
+
+    const filteredAdmins = admins.filter(admin =>
+        admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        admin.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     if (loading) return <div className="text-center p-5"><div className="spinner-border text-success"></div></div>;
 
@@ -41,6 +48,19 @@ const AdminsList: React.FC = () => {
             </div>
 
             <div className="card border-0 shadow-sm rounded-4 overflow-hidden">
+                {/* Search and filters section */}
+                <div className="p-4 bg-light border-bottom">
+                    <div className="input-group mw-400">
+                        <span className="input-group-text bg-white border-end-0"><FaSearch className="text-muted" /></span>
+                        <input
+                            type="text"
+                            className="form-control border-start-0"
+                            placeholder="Buscar por nome ou email..."
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                </div>
                 <div className="table-responsive">
                     <table className="table table-hover mb-0 align-middle">
                         <thead className="bg-light">
@@ -51,7 +71,7 @@ const AdminsList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {admins.map(admin => (
+                            {filteredAdmins.map(admin => (
                                 <tr key={admin.id}>
                                     <td className="ps-4 fw-bold">{admin.name}</td>
                                     <td>{admin.email}</td>
@@ -62,6 +82,13 @@ const AdminsList: React.FC = () => {
                                     </td>
                                 </tr>
                             ))}
+                            {filteredAdmins.length === 0 && (
+                                <tr>
+                                    <td colSpan={3} className="text-center py-5 text-muted">
+                                        Nenhum administrador encontrado.
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>

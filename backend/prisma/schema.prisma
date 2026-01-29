@@ -113,18 +113,19 @@ model Ecopoint {
 }
 
 model ReportedProblem {
-  id                   Int            @id @default(autoincrement())
-  problem_type         String
-  description          String
-  status               String
-  url_attachments      String
-  protocol             String
-  created_at           DateTime       @default(now())
-  updated_at           DateTime       @updatedAt
-  subscriber_id        Int
-  resolved_by_admin_id Int?
-  resolved_by          Administrador? @relation("ProblemResolvedBy", fields: [resolved_by_admin_id], references: [id])
-  subscriber           Subscriber     @relation(fields: [subscriber_id], references: [id])
+  id                       Int            @id @default(autoincrement())
+  problem_type             String
+  description              String
+  status                   String
+  url_attachments          String
+  protocol                 String
+  created_at               DateTime       @default(now())
+  updated_at               DateTime       @updatedAt
+  subscriber_id            Int
+  resolved_by_admin_id     Int?
+  resolution_justification String?         @ecorota.Text
+  resolved_by              Administrador?  @relation("ProblemResolvedBy", fields: [resolved_by_admin_id], references: [id])
+  subscriber               Subscriber      @relation(fields: [subscriber_id], references: [id])
 
   @@index([status])
   @@index([protocol])

@@ -1,0 +1,15 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ecorota-frontend
+    ports:
+      - "3000:80"
+    restart: always
+    networks:
+      - ecorota-network
+
+networks:
+  ecorota-network:
+    driver: bridge

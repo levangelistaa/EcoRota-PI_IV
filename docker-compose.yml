@@ -25,10 +25,15 @@ services:
     environment:
       - DATABASE_URL=mysql://root:root@database:3306/ecorota
       - JWT_SECRET=secret
+    command: >
+      sh -c "npx prisma db push && npx prisma db seed && node dist/src/server.js"
+    volumes:
+      - uploads_data:/app/public/uploads
     networks:
       - ecorota-network
     depends_on:
-      - database
+      database:
+        condition: service_healthy
 
   database:
     image: mysql:8.0
@@ -41,6 +46,11 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - ecorota-network
 
@@ -50,3 +60,4 @@ networks:
 
 volumes:
   mysql_data:
+  uploads_data:

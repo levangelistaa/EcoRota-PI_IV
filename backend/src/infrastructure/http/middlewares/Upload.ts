@@ -8,7 +8,10 @@ const __dirname = path.dirname(__filename);
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.resolve(__dirname, "..", "..", "..", "..", "public", "uploads"));
+    const uploadPath = process.env.NODE_ENV === 'production' 
+      ? path.resolve('/app/public/uploads')
+      : path.resolve(__dirname, "..", "..", "..", "..", "public", "uploads");
+    cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
     const fileHash = crypto.randomBytes(10).toString("hex");

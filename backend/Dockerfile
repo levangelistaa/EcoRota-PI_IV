@@ -1,25 +1,43 @@
+FROM node:22-alpine AS build
+
+WORKDIR /app
+
+COPY package*.json ./
+COPY prisma ./prisma/
+COPY prisma.config.ts ./
+
+RUN npm ci
+
+RUN npx prisma generate
+
+COPY . .
+RUN npm run build
+
+FROM node:22-alpine AS dependencies
+
+WORKDIR /app
+
+COPY package*.json ./
+COPY prisma ./prisma/
+COPY prisma.config.ts ./
+RUN npm ci --omit=dev && npx prisma generate
+
 FROM node:22-alpine
 
 WORKDIR /app
 
-# Copy package files and prisma schema
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/prisma ./prisma
+COPY prisma.config.ts ./
 COPY package*.json ./
-COPY prisma ./prisma/
 
-# Install dependencies including dev dependencies (needed for build)
-RUN npm install
+ENV NODE_ENV=production
 
-# Generate Prisma Client
-RUN npx prisma generate
+RUN mkdir -p /app/public/uploads && chown -R node:node /app/public
 
-# Copy the rest of the application code
-COPY . .
+USER node
 
-# Build the TypeScript application
-RUN npm run build
-
-# Expose the application port
 EXPOSE 3000
 
-# Start the application
-CMD ["npm", "run", "start"]
+CMD ["node", "dist/src/server.js"]

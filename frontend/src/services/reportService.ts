@@ -10,6 +10,8 @@ export interface ProblemReport {
     subscriberId: number;
     createdAt: string;
     updatedAt: string;
+    justification: string | null;
+    resolvedByAdminId: number | null;
 }
 
 export interface CreateProblemReport {
@@ -44,8 +46,8 @@ export const reportService = {
         return response.data;
     },
 
-    async updateStatus(id: number, status: ProblemReport['status']): Promise<ProblemReport> {
-        const response = await api.patch<ProblemReport>(`/problem-reports/${id}/resolve`, { status });
+    async updateStatus(id: number, status: ProblemReport['status'], justification?: string): Promise<ProblemReport> {
+        const response = await api.patch<ProblemReport>(`/problem-reports/${id}/resolve`, { status, justification });
         return response.data;
     },
 

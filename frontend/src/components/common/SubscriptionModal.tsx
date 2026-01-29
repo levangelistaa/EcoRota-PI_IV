@@ -3,6 +3,7 @@ import { neighborhoodService, type Neighborhood } from '../../services/neighborh
 import { subscriberService } from '../../services/subscriberService';
 import { toast } from 'react-hot-toast';
 import { FaBell, FaTimes, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
+import { useAuth } from '../../context/AuthContext';
 
 interface SubscriptionModalProps {
     isOpen: boolean;
@@ -10,6 +11,8 @@ interface SubscriptionModalProps {
 }
 
 const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, onClose }) => {
+    const { setSubscriberData } = useAuth();
+    const [mode, setMode] = useState<'register' | 'recover'>('register');
     const [neighborhoods, setNeighborhoods] = useState<Neighborhood[]>([]);
     const [form, setForm] = useState({
         email: '',
@@ -18,11 +21,14 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, onClose }
         complement: '',
         neighborhoodId: ''
     });
+    const [recoverEmail, setRecoverEmail] = useState('');
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
             loadNeighborhoods();
+            setMode('register');
+            setRecoverEmail('');
         }
     }, [isOpen]);
 
@@ -32,6 +38,34 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, onClose }
             setNeighborhoods(data);
         } catch (error) {
             console.error('Erro ao carregar bairros:', error);
+        }
+    }
+
+    async function handleRecover(e: React.FormEvent) {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const subscriber = await subscriberService.findByEmail(recoverEmail);
+            
+            const essentialData = { 
+                id: subscriber.id, 
+                email: subscriber.email,
+                neighborhoodId: subscriber.neighborhoodId 
+            };
+            setSubscriberData(essentialData);
+            
+            toast.success('Acesso recuperado com sucesso!', { duration: 4000 });
+            onClose();
+        } catch (error: any) {
+            console.error('Erro ao recuperar:', error);
+            if (error.response?.status === 404) {
+                toast.error('E-mail não encontrado.');
+            } else {
+                toast.error('Erro ao recuperar acesso. Tente novamente.');
+            }
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -52,13 +86,12 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, onClose }
             toast.success('Inscrição realizada com sucesso! Você receberá atualizações sobre seu bairro.', {
                 duration: 6000
             });
-            localStorage.setItem('hasSubscribed', 'true');
             const essentialData = { 
                 id: subscriber.id, 
                 email: subscriber.email,
                 neighborhoodId: subscriber.neighborhoodId 
             };
-            localStorage.setItem('subscriberData', JSON.stringify(essentialData));
+            setSubscriberData(essentialData);
             onClose();
         } catch (error) {
             console.error('Erro ao inscrever:', error);
@@ -102,96 +135,153 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen, onClose }
                                     <h4 className="fw-bold">Fique por dentro!</h4>
                                 </div>
 
-                                <form onSubmit={handleSubmit}>
-                                    <div className="mb-3">
-                                        <label className="form-label small fw-bold text-muted text-uppercase letter-spacing-1">
-                                            <FaEnvelope className="me-2" /> E-mail para Avisos
-                                        </label>
-                                        <input 
-                                            type="email" 
-                                            className="form-control form-control-lg border-2 br-12" 
-                                            required 
-                                            placeholder="seu@email.com"
-                                            value={form.email}
-                                            onChange={e => setForm({...form, email: e.target.value})}
-                                        />
-                                    </div>
+                                {mode === 'register' ? (
+                                    <>
+                                        <form onSubmit={handleSubmit}>
+                                            <div className="mb-3">
+                                                <label className="form-label small fw-bold text-muted text-uppercase letter-spacing-1">
+                                                    <FaEnvelope className="me-2" /> E-mail para Avisos
+                                                </label>
+                                                <input 
+                                                    type="email" 
+                                                    className="form-control form-control-lg border-2 br-12" 
+                                                    required 
+                                                    placeholder="seu@email.com"
+                                                    value={form.email}
+                                                    onChange={e => setForm({...form, email: e.target.value})}
+                                                />
+                                            </div>
 
-                                    <div className="row g-2 mb-3">
-                                        <div className="col-md-8">
-                                            <label className="form-label small fw-bold text-muted text-uppercase letter-spacing-1">Rua</label>
-                                            <input 
-                                                type="text" 
-                                                className="form-control border-2 br-12" 
-                                                required 
-                                                placeholder="Nome da rua"
-                                                value={form.street}
-                                                onChange={e => setForm({...form, street: e.target.value})}
-                                            />
+                                            <div className="row g-2 mb-3">
+                                                <div className="col-md-8">
+                                                    <label className="form-label small fw-bold text-muted text-uppercase letter-spacing-1">Rua</label>
+                                                    <input 
+                                                        type="text" 
+                                                        className="form-control border-2 br-12" 
+                                                        required 
+                                                        placeholder="Nome da rua"
+                                                        value={form.street}
+                                                        onChange={e => setForm({...form, street: e.target.value})}
+                                                    />
+                                                </div>
+                                                <div className="col-md-4">
+                                                    <label className="form-label small fw-bold text-muted text-uppercase letter-spacing-1">Nº</label>
+                                                    <input 
+                                                        type="text" 
+                                                        className="form-control border-2 br-12" 
+                                                        required 
+                                                        placeholder="123"
+                                                        value={form.number}
+                                                        onChange={e => setForm({...form, number: e.target.value})}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="mb-3">
+                                                <label className="form-label small fw-bold text-muted text-uppercase letter-spacing-1">Complemento</label>
+                                                <input 
+                                                    type="text" 
+                                                    className="form-control border-2 br-12" 
+                                                    placeholder="Ex: Apto 101, Ao lado da padaria"
+                                                    value={form.complement}
+                                                    onChange={e => setForm({...form, complement: e.target.value})}
+                                                />
+                                            </div>
+
+                                            <div className="mb-4">
+                                                <label className="form-label small fw-bold text-muted text-uppercase letter-spacing-1">
+                                                    <FaMapMarkerAlt className="me-2" /> Seu Bairro
+                                                </label>
+                                                <select 
+                                                    className="form-select border-2 br-12" 
+                                                    required
+                                                    value={form.neighborhoodId}
+                                                    onChange={e => setForm({...form, neighborhoodId: e.target.value})}
+                                                >
+                                                    <option value="">Selecione...</option>
+                                                    {neighborhoods.map(n => (
+                                                        <option key={n.id} value={n.id}>{n.name}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            <div className="d-grid gap-2">
+                                                <button 
+                                                    type="submit" 
+                                                    className="btn btn-success btn-lg fw-bold border-0 py-3 shadow-sm hover-grow br-14 btn-green-gradient" 
+                                                    disabled={loading}
+                                                >
+                                                    {loading ? (
+                                                        <span className="spinner-border spinner-border-sm me-2"></span>
+                                                    ) : 'Quero Receber Avisos'}
+                                                </button>
+                                                
+                                                <div className="text-center mt-2">
+                                                    <button 
+                                                        type="button" 
+                                                        onClick={() => setMode('recover')}
+                                                        className="btn btn-link text-primary text-decoration-none small fw-bold"
+                                                    >
+                                                        Já tenho cadastro? Recuperar acesso
+                                                    </button>
+                                                </div>
+
+                                                <button 
+                                                    type="button" 
+                                                    onClick={() => {
+                                                        localStorage.setItem('hasSubscribed', 'dismissed');
+                                                        onClose();
+                                                    }}
+                                                    className="btn btn-link text-muted text-decoration-none small pt-2"
+                                                >
+                                                    Não, obrigado. Não quero ser avisado.
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="mb-4">
+                                            <h4 className="fw-bold text-dark">Recuperar Acesso</h4>
+                                            <p className="text-secondary small">Informe seu e-mail para recuperar seu cadastro e preferências.</p>
                                         </div>
-                                        <div className="col-md-4">
-                                            <label className="form-label small fw-bold text-muted text-uppercase letter-spacing-1">Nº</label>
-                                            <input 
-                                                type="text" 
-                                                className="form-control border-2 br-12" 
-                                                required 
-                                                placeholder="123"
-                                                value={form.number}
-                                                onChange={e => setForm({...form, number: e.target.value})}
-                                            />
-                                        </div>
-                                    </div>
+                                        <form onSubmit={handleRecover}>
+                                            <div className="mb-4">
+                                                <label className="form-label small fw-bold text-muted text-uppercase letter-spacing-1">
+                                                    <FaEnvelope className="me-2" /> Seu E-mail Cadastrado
+                                                </label>
+                                                <input 
+                                                    type="email" 
+                                                    className="form-control form-control-lg border-2 br-12" 
+                                                    required 
+                                                    placeholder="seu@email.com"
+                                                    value={recoverEmail}
+                                                    onChange={e => setRecoverEmail(e.target.value)}
+                                                />
+                                            </div>
 
-                                    <div className="mb-3">
-                                        <label className="form-label small fw-bold text-muted text-uppercase letter-spacing-1">Complemento</label>
-                                        <input 
-                                            type="text" 
-                                            className="form-control border-2 br-12" 
-                                            placeholder="Ex: Apto 101, Ao lado da padaria"
-                                            value={form.complement}
-                                            onChange={e => setForm({...form, complement: e.target.value})}
-                                        />
-                                    </div>
-
-                                    <div className="mb-4">
-                                        <label className="form-label small fw-bold text-muted text-uppercase letter-spacing-1">
-                                            <FaMapMarkerAlt className="me-2" /> Seu Bairro
-                                        </label>
-                                        <select 
-                                            className="form-select border-2 br-12" 
-                                            required
-                                            value={form.neighborhoodId}
-                                            onChange={e => setForm({...form, neighborhoodId: e.target.value})}
-                                        >
-                                            <option value="">Selecione...</option>
-                                            {neighborhoods.map(n => (
-                                                <option key={n.id} value={n.id}>{n.name}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    <div className="d-grid gap-2">
-                                        <button 
-                                            type="submit" 
-                                            className="btn btn-success btn-lg fw-bold border-0 py-3 shadow-sm hover-grow br-14 btn-green-gradient" 
-                                            disabled={loading}
-                                        >
-                                            {loading ? (
-                                                <span className="spinner-border spinner-border-sm me-2"></span>
-                                            ) : 'Quero Receber Avisos'}
-                                        </button>
-                                        <button 
-                                            type="button" 
-                                            onClick={() => {
-                                                localStorage.setItem('hasSubscribed', 'dismissed');
-                                                onClose();
-                                            }}
-                                            className="btn btn-link text-muted text-decoration-none small pt-2"
-                                        >
-                                            Não, obrigado. Não quero ser avisado.
-                                        </button>
-                                    </div>
-                                </form>
+                                            <div className="d-grid gap-2">
+                                                <button 
+                                                    type="submit" 
+                                                    className="btn btn-primary btn-lg fw-bold border-0 py-3 shadow-sm hover-grow br-14" 
+                                                    disabled={loading}
+                                                >
+                                                    {loading ? (
+                                                        <span className="spinner-border spinner-border-sm me-2"></span>
+                                                    ) : 'Recuperar Acesso'}
+                                                </button>
+                                                
+                                                <button 
+                                                    type="button" 
+                                                    onClick={() => setMode('register')}
+                                                    className="btn btn-link text-muted text-decoration-none small fw-bold mt-2"
+                                                >
+                                                    Voltar para Cadastro
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>

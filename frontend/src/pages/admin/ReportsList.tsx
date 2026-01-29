@@ -5,10 +5,12 @@ import { neighborhoodService } from '../../services/neighborhoodService';
 import type { Neighborhood } from '../../services/neighborhoodService';
 import { subscriberService } from '../../services/subscriberService';
 import type { Subscriber } from '../../services/subscriberService';
-import { FaTrash, FaFilter, FaEye } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+import { FaTrash, FaFilter, FaEye, FaArrowLeft } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import ReportDetailsModal from '../../components/common/ReportDetailsModal';
+import JustificationModal from '../../components/common/JustificationModal';
 
 const ReportsList: React.FC = () => {
     const [reports, setReports] = useState<ProblemReport[]>([]);
@@ -18,6 +20,11 @@ const ReportsList: React.FC = () => {
     const [filterStatus, setFilterStatus] = useState<string>('');
     const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; id?: number }>({ isOpen: false });
     const [detailsModal, setDetailsModal] = useState<{ isOpen: boolean; report: ProblemReport | null }>({ isOpen: false, report: null });
+    const [justificationModal, setJustificationModal] = useState<{
+        isOpen: boolean;
+        pendingStatus?: ProblemReport['status'];
+        pendingId?: number;
+    }>({ isOpen: false });
 
     useEffect(() => {
         loadData();
@@ -42,13 +49,36 @@ const ReportsList: React.FC = () => {
     }
 
     async function handleStatusChange(id: number, newStatus: ProblemReport['status']) {
+        // Require justification for RESOLVED or REJECTED status
+        if (newStatus === 'RESOLVED' || newStatus === 'REJECTED') {
+            setJustificationModal({
+                isOpen: true,
+                pendingStatus: newStatus,
+                pendingId: id
+            });
+            return;
+        }
+
+        // For other statuses, update immediately
+        await updateStatus(id, newStatus);
+    }
+
+    async function handleJustificationConfirm(justification: string) {
+        if (justificationModal.pendingId && justificationModal.pendingStatus) {
+            await updateStatus(justificationModal.pendingId, justificationModal.pendingStatus, justification);
+            setJustificationModal({ isOpen: false });
+        }
+    }
+
+    async function updateStatus(id: number, status: ProblemReport['status'], justification?: string) {
         try {
-            await reportService.updateStatus(id, newStatus);
-            setReports(reports.map(r => r.id === id ? { ...r, status: newStatus } : r));
+            await reportService.updateStatus(id, status, justification);
+            await loadData();
             toast.success('Status atualizado com sucesso!');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Erro ao atualizar status:', error);
-            toast.error('Erro ao atualizar status do relato.');
+            const message = error.response?.data?.error || 'Erro ao atualizar status do relato.';
+            toast.error(message);
         }
     }
 
@@ -87,8 +117,11 @@ const ReportsList: React.FC = () => {
 
     return (
         <div className="container py-5">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="fw-bold">Problemas Reportados</h2>
+            <div className="d-flex align-items-center gap-3 mb-4">
+                <Link to="/admin/dashboard" className="btn btn-outline-success btn-circle-sm rounded-circle d-flex align-items-center justify-content-center" title="Voltar ao Dashboard">
+                    <FaArrowLeft />
+                </Link>
+                <h2 className="fw-bold mb-0">Problemas Reportados</h2>
             </div>
 
             <div className="card border-0 shadow-sm rounded-4 overflow-hidden">
@@ -186,6 +219,15 @@ const ReportsList: React.FC = () => {
                 </div>
             </div>
 
+            <JustificationModal
+                isOpen={justificationModal.isOpen}
+                title={`Justificar ${justificationModal.pendingStatus === 'RESOLVED' ? 'Resolução' : 'Rejeição'}`}
+                message={`Por favor, forneça uma justificativa para marcar este relato como "${justificationModal.pendingStatus === 'RESOLVED' ? 'Resolvido' : 'Rejeitado'}":`}
+                onConfirm={handleJustificationConfirm}
+                onCancel={() => setJustificationModal({ isOpen: false })}
+                confirmText="Salvar Status"
+            />
+            
             <ReportDetailsModal 
                 isOpen={detailsModal.isOpen} 
                 report={detailsModal.report}

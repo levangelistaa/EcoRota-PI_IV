@@ -9,18 +9,30 @@ interface Administrator {
   name: string;
 }
 
+interface SubscriberData {
+  id: number;
+  email: string;
+  neighborhoodId: number;
+}
+
 interface AuthContextData {
   administrator: Administrator | null;
   signed: boolean;
   loading: boolean;
+  subscriberData: SubscriberData | null;
+  isSubscriber: boolean;
   signIn(credentials: LoginRequest): Promise<void>;
   signOut(): void;
+  updateAdministrator(data: Administrator): void;
+  setSubscriberData(data: SubscriberData | null): void;
 }
+
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [administrator, setAdministrator] = useState<Administrator | null>(null);
+  const [subscriberData, setSubscriberDataState] = useState<SubscriberData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,6 +43,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (storageAdministrator && storageToken) {
         setAdministrator(JSON.parse(storageAdministrator));
       }
+
+      const storageSubscriber = localStorage.getItem('subscriberData');
+      if (storageSubscriber) {
+        setSubscriberDataState(JSON.parse(storageSubscriber));
+      }
+
       setLoading(false);
     }
 
@@ -47,8 +65,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setAdministrator(null);
   }
 
+  function updateAdministrator(data: Administrator) {
+    localStorage.setItem('@EcoRota:administrator', JSON.stringify(data));
+    setAdministrator(data);
+  }
+
+  function setSubscriberData(data: SubscriberData | null) {
+    if (data) {
+      localStorage.setItem('subscriberData', JSON.stringify(data));
+      localStorage.setItem('hasSubscribed', 'true');
+    } else {
+      localStorage.removeItem('subscriberData');
+      localStorage.removeItem('hasSubscribed');
+    }
+    setSubscriberDataState(data);
+  }
+
   return (
-    <AuthContext.Provider value={{ signed: !!administrator, administrator, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ 
+      signed: !!administrator, 
+      administrator, 
+      loading, 
+      subscriberData,
+      isSubscriber: !!subscriberData,
+      signIn, 
+      signOut, 
+      updateAdministrator,
+      setSubscriberData
+    }}>
       {children}
     </AuthContext.Provider>
   );

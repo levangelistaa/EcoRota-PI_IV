@@ -94,6 +94,20 @@ const ReportDetailsModal: React.FC<ReportDetailsModalProps> = ({ isOpen, report,
                                 </div>
                             </div>
 
+                            {/* Justification */}
+                            {report.justification && (
+                                <div className="col-12">
+                                    <div className="p-3 bg-warning-subtle br-14 border border-warning">
+                                        <label className="form-label small fw-bold text-dark text-uppercase letter-spacing-1 mb-2 d-block text-center border-bottom border-warning pb-2">
+                                            Justificativa da Resolução
+                                        </label>
+                                        <p className="mb-0 text-dark lh-lg" style={{ whiteSpace: 'pre-wrap' }}>
+                                            {report.justification}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Evidence (Images) */}
                             {report.attachments && report.attachments.length > 0 && (
                                 <div className="col-12 mt-4">

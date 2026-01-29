@@ -23,6 +23,7 @@ import RouteForm from './pages/admin/RouteForm';
 import EcopointsList from './pages/admin/EcopointsList';
 import EcopointForm from './pages/admin/EcopointForm';
 import ReportsList from './pages/admin/ReportsList';
+import Profile from './pages/admin/Profile';
 
 function ScrollToHash() {
   const { hash } = useLocation();
@@ -60,6 +61,10 @@ function App() {
               <Route
                 path="/admin/dashboard"
                 element={<ProtectedRoute><Dashboard /></ProtectedRoute>}
+              />
+              <Route
+                path="/admin/profile"
+                element={<ProtectedRoute><Profile /></ProtectedRoute>}
               />
               <Route
                 path="/admin/neighborhoods"

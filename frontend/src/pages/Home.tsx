@@ -4,17 +4,19 @@ import CalendarSection from '../components/home/CalendarSection';
 import Sidebar from '../components/home/Sidebar';
 import SubscriptionModal from '../components/common/SubscriptionModal';
 import { useAuth } from '../context/AuthContext';
+import type { Neighborhood } from '../services/neighborhoodService';
+import type { Ecopoint } from '../services/ecopointService';
 
 function Home() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [filterTerm, setFilterTerm] = useState('');
+    const [selectedItem, setSelectedItem] = useState<Neighborhood | Ecopoint | null>(null);
     const { signed } = useAuth();
 
     useEffect(() => {
         const hasSubscribed = localStorage.getItem('hasSubscribed');
         
-        // Don't show modal if already subscribed OR if an admin is logged in
         if (!hasSubscribed && !signed) {
-            // Show modal after a small delay for better UX
             const timer = setTimeout(() => {
                 setIsModalOpen(true);
             }, 1500);
@@ -24,12 +26,16 @@ function Home() {
 
     return (
         <div className="home-page">
-            <MapSection />
+            <MapSection item={selectedItem} />
 
             <div className="container py-5">
                 <div className="row g-4">
-                    <CalendarSection />
-                    <Sidebar openSubscriptionModal={() => setIsModalOpen(true)} />
+                    <CalendarSection filterTerm={filterTerm} />
+                    <Sidebar 
+                        openSubscriptionModal={() => setIsModalOpen(true)} 
+                        onSearchChange={(term: string) => setFilterTerm(term)}
+                        onItemSelect={(item) => setSelectedItem(item)}
+                    />
                 </div>
             </div>
 

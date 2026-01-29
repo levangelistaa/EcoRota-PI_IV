@@ -12,8 +12,13 @@ interface DaySchedule {
     }[];
 }
 
-const CalendarSection: React.FC = () => {
-    const [schedule, setSchedule] = useState<DaySchedule[]>([]);
+interface CalendarSectionProps {
+    filterTerm: string;
+}
+
+const CalendarSection: React.FC<CalendarSectionProps> = ({ filterTerm }) => {
+    const [allSchedule, setAllSchedule] = useState<DaySchedule[]>([]);
+    const [filteredSchedule, setFilteredSchedule] = useState<DaySchedule[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -60,13 +65,32 @@ const CalendarSection: React.FC = () => {
                 });
             });
 
-            setSchedule(scheduleByDay);
+            setAllSchedule(scheduleByDay);
+            setFilteredSchedule(scheduleByDay);
         } catch (error) {
             console.error('Erro ao carregar calendário:', error);
         } finally {
             setLoading(false);
         }
     }
+
+    useEffect(() => {
+        if (!filterTerm.trim()) {
+            setFilteredSchedule(allSchedule);
+            return;
+        }
+
+        const filtered = allSchedule.map(day => ({
+            ...day,
+            routes: day.routes.filter(route => 
+                route.neighborhoods.some(n => 
+                    n.toLowerCase().includes(filterTerm.toLowerCase())
+                )
+            )
+        })).filter(day => day.routes.length > 0);
+
+        setFilteredSchedule(filtered);
+    }, [filterTerm, allSchedule]);
 
     if (loading) {
         return (
@@ -91,9 +115,15 @@ const CalendarSection: React.FC = () => {
 
                 <div className="container-scrollable pe-2 max-h-300">
                     <div className="row g-3">
-                        {schedule.map((item, index) => (
-                            <CalendarDay key={index} day={item.day} routes={item.routes} />
-                        ))}
+                        {filteredSchedule.length > 0 ? (
+                            filteredSchedule.map((item, index) => (
+                                <CalendarDay key={index} day={item.day} routes={item.routes} />
+                            ))
+                        ) : (
+                            <div className="col-12 py-4 text-center text-muted">
+                                <p className="mb-0">Nenhuma rota encontrada para este bairro.</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

@@ -22,6 +22,13 @@ export const subscriberService = {
         return response.data;
     },
 
+    async findByEmail(email: string): Promise<Subscriber> {
+        const response = await api.get<Subscriber>('/subscribers/identify', {
+            params: { email }
+        });
+        return response.data;
+    },
+
     async unsubscribe(id: number): Promise<void> {
         await api.delete(`/subscribers/${id}`);
     }

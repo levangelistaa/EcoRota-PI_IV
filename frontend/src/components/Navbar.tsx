@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
-    const { signed } = useAuth();
+    const { signed, isSubscriber } = useAuth();
 
     const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         const menu = e.currentTarget.closest('.dropdown-menu');
@@ -26,7 +26,6 @@ function Navbar() {
                 </button>
                 <div className="collapse navbar-collapse justify-content-center" id="navbarNav">
                     <ul className="navbar-nav gap-lg-4">
-                        {/* Home Dropdown */}
                         <li className="nav-item dropdown" onMouseLeave={handleMouseLeave}>
                             <Link className="nav-link dropdown-toggle text-white fw-bold" to="/" id="homeDrop">
                                 Home
@@ -39,7 +38,16 @@ function Navbar() {
                             </ul>
                         </li>
 
-                        {/* Item: Informações */}
+                        <li className="nav-item dropdown" onMouseLeave={handleMouseLeave}>
+                            <Link className="nav-link dropdown-toggle text-white fw-bold" to="/ecopontos" id="ecopontosDrop">
+                                Ecopontos
+                            </Link>
+                            <ul className="dropdown-menu shadow">
+                                <li><Link className="dropdown-item" to="/ecopontos#parceiros" onClick={handleItemClick}>Parceiros</Link></li>
+                                <li><Link className="dropdown-item" to="/ecopontos#como-contribuir" onClick={handleItemClick}>Como Contribuir?</Link></li>
+                            </ul>
+                        </li>
+
                         <li className="nav-item dropdown" onMouseLeave={handleMouseLeave}>
                             <Link className="nav-link dropdown-toggle text-white fw-bold" to="/informacoes" id="infoDrop">
                                 Informações
@@ -51,31 +59,20 @@ function Navbar() {
                             </ul>
                         </li>
 
-                        {/* Item: Ecopontos */}
-                        <li className="nav-item dropdown" onMouseLeave={handleMouseLeave}>
-                            <Link className="nav-link dropdown-toggle text-white fw-bold" to="/ecopontos" id="ecopontosDrop">
-                                Ecopontos
-                            </Link>
-                            <ul className="dropdown-menu shadow">
-                                <li><Link className="dropdown-item" to="/ecopontos#parceiros" onClick={handleItemClick}>Parceiros</Link></li>
-                                <li><Link className="dropdown-item" to="/ecopontos#como-contribuir" onClick={handleItemClick}>Como Contribuir?</Link></li>
-                            </ul>
-                        </li>
-
-
-                        {/* Item: Portal do Servidor */}
-                        <li className="nav-item dropdown" onMouseLeave={handleMouseLeave}>
-                            <Link className="nav-link dropdown-toggle text-white fw-bold" to="#" id="adminDrop">
-                                Portal do Servidor
-                            </Link>
-                            <ul className="dropdown-menu shadow">
-                                {signed ? (
-                                    <li><Link className="dropdown-item" to="/admin/dashboard" onClick={handleItemClick}>Acessar Dashboard</Link></li>
-                                ) : (
-                                    <li><Link className="dropdown-item" to="/admin-login" onClick={handleItemClick}>Login Administrador</Link></li>
-                                )}
-                            </ul>
-                        </li>
+                        {!isSubscriber && (
+                            <li className="nav-item dropdown" onMouseLeave={handleMouseLeave}>
+                                <Link className="nav-link dropdown-toggle text-white fw-bold" to="#" id="adminDrop">
+                                    Portal do Servidor
+                                </Link>
+                                <ul className="dropdown-menu shadow">
+                                    {signed ? (
+                                        <li><Link className="dropdown-item" to="/admin/dashboard" onClick={handleItemClick}>Acessar Dashboard</Link></li>
+                                    ) : (
+                                        <li><Link className="dropdown-item" to="/admin-login" onClick={handleItemClick}>Login Administrador</Link></li>
+                                    )}
+                                </ul>
+                            </li>
+                        )}
 
                     </ul>
                 </div>

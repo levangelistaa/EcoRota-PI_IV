@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { authService } from '../../services/authService';
-import { FaUserShield, FaPlus, FaSearch } from 'react-icons/fa';
+import { FaUserShield, FaPlus, FaSearch, FaArrowLeft } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 
@@ -40,8 +40,13 @@ const AdminsList: React.FC = () => {
 
     return (
         <div className="container py-5">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="fw-bold">Administradores do Sistema</h2>
+            <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <div className="d-flex align-items-center gap-3">
+                    <Link to="/admin/dashboard" className="btn btn-outline-success btn-circle-sm rounded-circle d-flex align-items-center justify-content-center" title="Voltar ao Dashboard">
+                        <FaArrowLeft />
+                    </Link>
+                    <h2 className="fw-bold mb-0">Administradores do Sistema</h2>
+                </div>
                 <Link to="/admin/users/new" className="btn btn-success d-flex align-items-center gap-2 rounded-pill px-4">
                     <FaPlus /> Novo Admin
                 </Link>

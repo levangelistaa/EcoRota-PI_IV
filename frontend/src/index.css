@@ -141,6 +141,39 @@ section {
     background: linear-gradient(90deg, #198754 0%, #157347 100%) !important;
 }
 
+.bg-gradient-success {
+    background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%) !important;
+}
+
+.background-gradient-green {
+    background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%) !important;
+}
+
+.bg-soft-green { background-color: #f1f8f1 !important; }
+.bg-soft-red { background-color: #fff5f5 !important; }
+.bg-soft-blue { background-color: #f0f7ff !important; }
+
+.text-shadow-sm {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.transition-all {
+    transition: all 0.3s ease !important;
+}
+
+.hover-shadow:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
 .btn-circle-sm {
     width: 32px;
     height: 32px;

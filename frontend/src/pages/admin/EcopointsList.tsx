@@ -3,7 +3,7 @@ import { ecopointService } from '../../services/ecopointService';
 import type { Ecopoint } from '../../services/ecopointService';
 import { neighborhoodService } from '../../services/neighborhoodService';
 import type { Neighborhood } from '../../services/neighborhoodService';
-import { FaEdit, FaTrash, FaPlus, FaSearch, FaFilter } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaPlus, FaSearch, FaFilter, FaArrowLeft } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import ConfirmModal from '../../components/common/ConfirmModal';
@@ -78,8 +78,13 @@ const EcopointsList: React.FC = () => {
 
     return (
         <div className="container py-5">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="fw-bold">Gestão de Ecopontos</h2>
+            <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                <div className="d-flex align-items-center gap-3">
+                    <Link to="/admin/dashboard" className="btn btn-outline-success btn-circle-sm rounded-circle d-flex align-items-center justify-content-center" title="Voltar ao Dashboard">
+                        <FaArrowLeft />
+                    </Link>
+                    <h2 className="fw-bold mb-0">Gestão de Ecopontos</h2>
+                </div>
                 <Link to="/admin/ecopoints/new" className="btn btn-success d-flex align-items-center gap-2 rounded-pill px-4">
                     <FaPlus /> Novo Ecoponto
                 </Link>

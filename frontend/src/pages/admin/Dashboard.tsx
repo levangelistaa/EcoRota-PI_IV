@@ -1,27 +1,79 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { FaUsers, FaMapMarkedAlt, FaExclamationTriangle, FaSignOutAlt } from 'react-icons/fa';
+import { FaUsers, FaMapMarkedAlt, FaExclamationTriangle, FaSignOutAlt, FaUser } from 'react-icons/fa';
+import { neighborhoodService } from '../../services/neighborhoodService';
+import { subscriberService } from '../../services/subscriberService';
+import { reportService } from '../../services/reportService';
+
+interface DashboardStatistics {
+  neighborhoodsCount: number;
+  activeSubscribersCount: number;
+  pendingReportsCount: number;
+}
 
 const Dashboard: React.FC = () => {
     const { administrator, signOut } = useAuth();
+    const [stats, setStats] = useState<DashboardStatistics | null>(null);
+
+    useEffect(() => {
+        loadStats();
+    }, []);
+
+    async function loadStats() {
+        try {
+            const [neighborhoods, subscribers, reports] = await Promise.all([
+                neighborhoodService.list(),
+                subscriberService.list(),
+                reportService.list()
+            ]);
+            
+            setStats({
+                neighborhoodsCount: neighborhoods.length,
+                activeSubscribersCount: subscribers.length,
+                pendingReportsCount: reports.filter(r => r.status === 'PENDING').length
+            });
+        } catch (error) {
+            console.error('Erro ao carregar estatísticas:', error);
+        }
+    }
 
     const modules = [
-        { title: 'Bairros e Rotas', icon: <FaMapMarkedAlt />, count: '12 Bairros', color: 'bg-primary' },
-        { title: 'Assinantes', icon: <FaUsers />, count: '45 Ativos', color: 'bg-success' },
-        { title: 'Relatos de Problemas', icon: <FaExclamationTriangle />, count: '3 Pendentes', color: 'bg-warning' },
+        { 
+            title: 'Bairros e Rotas', 
+            icon: <FaMapMarkedAlt />, 
+            count: stats ? `${stats.neighborhoodsCount} Bairros` : 'Carregando...', 
+            color: 'bg-primary' 
+        },
+        { 
+            title: 'Assinantes', 
+            icon: <FaUsers />, 
+            count: stats ? `${stats.activeSubscribersCount} Ativos` : 'Carregando...', 
+            color: 'bg-success' 
+        },
+        { 
+            title: 'Relatos de Problemas', 
+            icon: <FaExclamationTriangle />, 
+            count: stats ? `${stats.pendingReportsCount} Pendentes` : 'Carregando...', 
+            color: 'bg-warning' 
+        },
     ];
 
     return (
         <div className="container py-5">
             <header className="d-flex justify-content-between align-items-center mb-5">
                 <div>
-                    <h1 className="fw-bold">Bem-vindo, {administrator?.name}</h1>
+                    <h1 className="fw-bold text-dark">Bem-vindo, {administrator?.name}</h1>
                     <p className="text-secondary text-uppercase small ls-wider">Painel de Administração do EcoRota</p>
                 </div>
-                <button className="btn btn-outline-danger d-flex align-items-center gap-2" onClick={signOut}>
-                    <FaSignOutAlt /> Sair
-                </button>
+                <div className="d-flex gap-2">
+                    <Link to="/admin/profile" className="btn btn-outline-primary d-flex align-items-center gap-2">
+                        <FaUser /> Perfil
+                    </Link>
+                    <button className="btn btn-outline-danger d-flex align-items-center gap-2" onClick={signOut}>
+                        <FaSignOutAlt /> Sair
+                    </button>
+                </div>
             </header>
 
             <div className="row g-4 mb-5">

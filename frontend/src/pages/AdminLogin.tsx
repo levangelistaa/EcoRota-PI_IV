@@ -9,8 +9,14 @@ const AdminLogin: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     
-    const { signIn } = useAuth();
+    const { signIn, isSubscriber } = useAuth();
     const navigate = useNavigate();
+
+    React.useEffect(() => {
+        if (isSubscriber) {
+            navigate('/');
+        }
+    }, [isSubscriber, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

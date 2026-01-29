@@ -5,6 +5,7 @@ import { ListSubscribersUseCase } from "../../application/use-cases/subscriber/L
 import { FindSubscriberByIdUseCase } from "../../application/use-cases/subscriber/FindSubscriberByIdUseCase.js";
 import { UpdateSubscriberProfileUseCase } from "../../application/use-cases/subscriber/UpdateSubscriberProfileUseCase.js";
 import { UnsubscribeUseCase } from "../../application/use-cases/subscriber/UnsubscribeUseCase.js";
+import { FindSubscriberByEmailUseCase } from "../../application/use-cases/subscriber/FindSubscriberByEmailUseCase.js";
 
 const registerSubscriberSchema = z.object({
     email: z.string().email(),
@@ -38,7 +39,8 @@ export class SubscriberController {
         private listSubscribersUseCase: ListSubscribersUseCase,
         private findSubscriberByIdUseCase: FindSubscriberByIdUseCase,
         private updateSubscriberProfileUseCase: UpdateSubscriberProfileUseCase,
-        private unsubscribeUseCase: UnsubscribeUseCase
+        private unsubscribeUseCase: UnsubscribeUseCase,
+        private findSubscriberByEmailUseCase: FindSubscriberByEmailUseCase
     ) { }
 
     /**
@@ -70,6 +72,22 @@ export class SubscriberController {
     async findById(req: Request, res: Response) {
         const id = Number(req.params.id);
         const output = await this.findSubscriberByIdUseCase.execute(id);
+
+        return res.status(200).json(output);
+    }
+
+    /**
+     * Busca um assinante pelo e-mail.
+     * GET /subscribers/identify
+     */
+    async identify(req: Request, res: Response) {
+        const email = req.query.email as string;
+        
+        if (!email) {
+            return res.status(400).json({ error: 'E-mail é obrigatório.' });
+        }
+
+        const output = await this.findSubscriberByEmailUseCase.execute(email);
 
         return res.status(200).json(output);
     }

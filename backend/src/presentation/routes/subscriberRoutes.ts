@@ -3,6 +3,7 @@ import { SubscriberController } from "../controllers/SubscriberController.js";
 import { RegisterSubscriberUseCase } from "../../application/use-cases/subscriber/RegisterSubscriberUseCase.js";
 import { ListSubscribersUseCase } from "../../application/use-cases/subscriber/ListSubscribersUseCase.js";
 import { FindSubscriberByIdUseCase } from "../../application/use-cases/subscriber/FindSubscriberByIdUseCase.js";
+import { FindSubscriberByEmailUseCase } from "../../application/use-cases/subscriber/FindSubscriberByEmailUseCase.js";
 import { UpdateSubscriberProfileUseCase } from "../../application/use-cases/subscriber/UpdateSubscriberProfileUseCase.js";
 import { UnsubscribeUseCase } from "../../application/use-cases/subscriber/UnsubscribeUseCase.js";
 import { PrismaSubscriberRepository } from "../../infrastructure/database/prisma/PrismaSubscriberRepository.js";
@@ -25,18 +26,21 @@ const listSubscribersUseCase = new ListSubscribersUseCase(subscriberRepository);
 const findSubscriberByIdUseCase = new FindSubscriberByIdUseCase(subscriberRepository);
 const updateSubscriberProfileUseCase = new UpdateSubscriberProfileUseCase(subscriberRepository, neighborhoodRepository);
 const unsubscribeUseCase = new UnsubscribeUseCase(subscriberRepository);
+const findSubscriberByEmailUseCase = new FindSubscriberByEmailUseCase(subscriberRepository);
 
 const subscriberController = new SubscriberController(
     registerSubscriberUseCase,
     listSubscribersUseCase,
     findSubscriberByIdUseCase,
     updateSubscriberProfileUseCase,
-    unsubscribeUseCase
+    unsubscribeUseCase,
+    findSubscriberByEmailUseCase
 );
 
 const authMiddleware = ensureAuthenticated(tokenProvider, administratorRepository);
 
 // Mapeamento de Rotas
+subscriberRoutes.get("/subscribers/identify", (req, res) => subscriberController.identify(req, res));
 subscriberRoutes.post("/subscribers", (req, res) => subscriberController.register(req, res));
 subscriberRoutes.get("/subscribers", (req, res) => subscriberController.list(req, res));
 subscriberRoutes.get("/subscribers/:id", (req, res) => subscriberController.findById(req, res));

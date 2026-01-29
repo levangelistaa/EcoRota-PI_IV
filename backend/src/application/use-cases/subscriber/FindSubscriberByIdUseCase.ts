@@ -1,5 +1,5 @@
 import { SubscriberRepository } from "../../../domain/repositories/SubscriberRepository.js";
-import { FindSubscriberByIdOutputDTO } from "../../dtos/subscriber/FindSubscriberByIdDTO.js";
+import { FindSubscriberByIdOutputDTO } from "../../dtos/subscriber/FindSubscriberDTO.js";
 
 /**
  * @class FindSubscriberByIdUseCase

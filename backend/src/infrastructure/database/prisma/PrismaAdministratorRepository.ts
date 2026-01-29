@@ -5,6 +5,7 @@ import { Email } from "../../../domain/value-objects/Email.js";
 import { EntityNotFoundError } from "../../../domain/errors/persistence/EntityNotFoundError.js";
 import { ConflictError } from "../../../domain/errors/persistence/ConflictError.js";
 import { PersistenceError } from "../../../domain/errors/persistence/PersistenceError.js";
+import { DependencyError } from "../../../domain/errors/persistence/DependencyError.js";
 
 export class PrismaAdministratorRepository implements AdministratorRepository {
   constructor(private prisma: PrismaClient) { }
@@ -138,6 +139,9 @@ export class PrismaAdministratorRepository implements AdministratorRepository {
     } catch (error: any) {
       if (error.code === 'P2025') {
         throw new EntityNotFoundError("Administrador", id);
+      }
+      if (error.code === 'P2003') {
+        throw new DependencyError("Não é possível excluir este administrador pois ele possui registros (bairros, rotas ou ecopontos) vinculados ao seu usuário.");
       }
       throw new PersistenceError(`Erro ao deletar administrador: ${error.message}`);
     }

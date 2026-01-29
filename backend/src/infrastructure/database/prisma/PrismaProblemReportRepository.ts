@@ -6,6 +6,7 @@ import { ProblemAttachments } from "../../../domain/value-objects/ProblemAttachm
 import { ProblemStatus } from "../../../domain/value-objects/ProblemStatus.js";
 import { ProblemDescription } from "../../../domain/value-objects/ProblemDescription.js";
 import { ProblemType } from "../../../domain/value-objects/ProblemType.js";
+import { ProblemJustification } from "../../../domain/value-objects/ProblemJustification.js";
 import { EntityNotFoundError } from "../../../domain/errors/persistence/EntityNotFoundError.js";
 import { ConflictError } from "../../../domain/errors/persistence/ConflictError.js";
 import { PersistenceError } from "../../../domain/errors/persistence/PersistenceError.js";
@@ -13,7 +14,7 @@ import { PersistenceError } from "../../../domain/errors/persistence/Persistence
 export class PrismaProblemReportRepository implements ProblemReportRepository {
   constructor(private prisma: PrismaClient) { }
 
-  async create(data: Omit<ProblemReport, "id" | "createdAt" | "updatedAt">): Promise<ProblemReport> {
+  async create(data: Omit<ProblemReport, "id" | "createdAt" | "updatedAt" | "justification">): Promise<ProblemReport> {
     try {
       const createdProblem = await this.prisma.reportedProblem.create({
         data: {
@@ -37,7 +38,8 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
         createdProblem.created_at,
         createdProblem.updated_at,
         createdProblem.subscriber_id,
-        createdProblem.resolved_by_admin_id
+        createdProblem.resolved_by_admin_id,
+        createdProblem.resolution_justification ? new ProblemJustification(createdProblem.resolution_justification) : null
       );
     } catch (error: any) {
       if (error.code === 'P2002') {
@@ -67,7 +69,8 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
         problem.created_at,
         problem.updated_at,
         problem.subscriber_id,
-        problem.resolved_by_admin_id
+        problem.resolved_by_admin_id,
+        problem.resolution_justification ? new ProblemJustification(problem.resolution_justification) : null
       );
     } catch (error: any) {
       if (error instanceof EntityNotFoundError) throw error;
@@ -93,7 +96,8 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
         problem.created_at,
         problem.updated_at,
         problem.subscriber_id,
-        problem.resolved_by_admin_id
+        problem.resolved_by_admin_id,
+        problem.resolution_justification ? new ProblemJustification(problem.resolution_justification) : null
       );
     } catch (error: any) {
       throw new PersistenceError(`Erro ao buscar relato por protocolo: ${error.message}`);
@@ -118,7 +122,8 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
             problem.created_at,
             problem.updated_at,
             problem.subscriber_id,
-            problem.resolved_by_admin_id
+            problem.resolved_by_admin_id,
+            problem.resolution_justification ? new ProblemJustification(problem.resolution_justification) : null
           )
       );
     } catch (error: any) {
@@ -142,7 +147,8 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
             problem.created_at,
             problem.updated_at,
             problem.subscriber_id,
-            problem.resolved_by_admin_id
+            problem.resolved_by_admin_id,
+            problem.resolution_justification ? new ProblemJustification(problem.resolution_justification) : null
           )
       );
     } catch (error: any) {
@@ -150,13 +156,14 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
     }
   }
 
-  async updateStatus(id: number, status: ProblemStatus, resolvedByAdminId?: number): Promise<ProblemReport> {
+  async updateStatus(id: number, status: ProblemStatus, resolvedByAdminId?: number, justification?: ProblemJustification): Promise<ProblemReport> {
     try {
       const updatedProblem = await this.prisma.reportedProblem.update({
         where: { id },
         data: {
           status: status.getValue(),
           resolved_by_admin_id: resolvedByAdminId,
+          resolution_justification: justification?.getValue(),
         },
       });
 
@@ -170,7 +177,8 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
         updatedProblem.created_at,
         updatedProblem.updated_at,
         updatedProblem.subscriber_id,
-        updatedProblem.resolved_by_admin_id
+        updatedProblem.resolved_by_admin_id,
+        updatedProblem.resolution_justification ? new ProblemJustification(updatedProblem.resolution_justification) : null
       );
     } catch (error: any) {
       if (error.code === 'P2025') {
@@ -192,6 +200,7 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
           problem_type: data.problemType?.getValue(),
           subscriber_id: data.subscriberId,
           resolved_by_admin_id: data.resolvedByAdminId,
+          resolution_justification: data.justification?.getValue(),
         },
       });
 
@@ -205,7 +214,8 @@ export class PrismaProblemReportRepository implements ProblemReportRepository {
         updatedProblem.created_at,
         updatedProblem.updated_at,
         updatedProblem.subscriber_id,
-        updatedProblem.resolved_by_admin_id
+        updatedProblem.resolved_by_admin_id,
+        updatedProblem.resolution_justification ? new ProblemJustification(updatedProblem.resolution_justification) : null
       );
     } catch (error: any) {
       if (error.code === 'P2025') {

@@ -1,4 +1,4 @@
-# ♻️ EcoRota-PI_IV
+# ♻️ EcoRota
 
 ![Status](https://img.shields.io/badge/STATUS-CONCLUÍDO-brightgreen?style=for-the-badge)
 ![Node](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
